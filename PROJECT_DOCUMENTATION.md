@@ -424,6 +424,7 @@ Notification:
 | Route | Mô Tả |
 |-------|-------|
 | `/api/auth` | Đăng ký, đăng nhập, hồ sơ |
+| `/api/users` | Danh sách User (admin); `?role=` tùy chọn |
 | `/api/roles` | Quản lý vai trò |
 | `/api/specialties` | Quản lý chuyên khoa |
 | `/api/hospitals` | Quản lý bệnh viện |
@@ -579,12 +580,13 @@ NODE_ENV=development
 - [x] Role-based authorization
 - [x] Automatic schedule closure
 - [x] Error middleware
+- [x] Request validation (Joi): middleware `validate.middleware.js`, schema cho `/api/auth`, `/api/appointments`
 
 ### ❌ Cần Hoàn Thành
 - [ ] Unit Tests
 - [ ] Integration Tests
 - [ ] API Documentation (Swagger/OpenAPI)
-- [ ] Request validation (Joi/Validation schemas)
+- [ ] Hoàn thiện Joi cho các route còn lại (đã có middleware + auth + appointments)
 - [ ] Email notifications
 - [ ] Payment gateway integration
 - [ ] File upload storage
@@ -660,3 +662,5 @@ Nếu có bất kỳ câu hỏi hoặc cần hỗ trợ:
 **Cập nhật lần cuối:** 28/03/2026
 **Status:** Đang phát triển (Development)
 **Version:** 1.0.0
+
+**Lưu ý quan trọng**: luôn luôn view lại file PROJECT_DOCUMENTATION.md để nắm được cấu trúc và hướng phát triển của dự án sau khi làm xong mỗi chức năng trước khi tiếp tục chức năng mới.(sau khi hoàn thành từng bước phải nhắc nhở tôi push lên git, và giúp tôi hoàn thành giai đoạn nào thì tích done là đã hoàn thành chức năng đó trong PROJECT_DOCUMENTATION.md)

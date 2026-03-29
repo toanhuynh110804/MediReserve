@@ -5,6 +5,7 @@ const morgan = require('morgan');
 require('express-async-errors');
 
 const authRoutes = require('./routes/auth.route');
+const userRoutes = require('./routes/user.route');
 const roleRoutes = require('./routes/role.route');
 const specialtyRoutes = require('./routes/specialty.route');
 const hospitalRoutes = require('./routes/hospital.route');
@@ -43,6 +44,7 @@ app.get('/', (req, res) => {
 });
 
 app.use('/api/auth', authRoutes);
+app.use('/api/users', userRoutes);
 app.use('/api/roles', roleRoutes);
 app.use('/api/specialties', specialtyRoutes);
 app.use('/api/hospitals', hospitalRoutes);
