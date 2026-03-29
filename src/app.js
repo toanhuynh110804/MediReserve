@@ -30,10 +30,22 @@ const medicineRoutes = require('./routes/medicine.route');
 const insuranceRoutes = require('./routes/insurance.route');
 
 const errorMiddleware = require('./middlewares/error.middleware');
+const { mountSwagger } = require('./config/swagger');
 
 const app = express();
 
-app.use(helmet());
+app.use(
+  helmet({
+    contentSecurityPolicy: {
+      directives: {
+        defaultSrc: ["'self'"],
+        scriptSrc: ["'self'", "'unsafe-inline'"],
+        styleSrc: ["'self'", "'unsafe-inline'"],
+        imgSrc: ["'self'", 'data:', 'https:'],
+      },
+    },
+  })
+);
 app.use(cors());
 app.use(express.json({ limit: '10mb' }));
 app.use(express.urlencoded({ extended: true }));
@@ -42,6 +54,8 @@ app.use(morgan('dev'));
 app.get('/', (req, res) => {
   res.json({ success: true, message: 'MediReserve API is running' });
 });
+
+mountSwagger(app);
 
 app.use('/api/auth', authRoutes);
 app.use('/api/users', userRoutes);

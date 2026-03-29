@@ -423,6 +423,8 @@ Notification:
 
 | Route | Mô Tả |
 |-------|-------|
+| `/api-docs` | Swagger UI — xem & thử API (OpenAPI 3) |
+| `/openapi.json` | Spec OpenAPI dạng JSON |
 | `/api/auth` | Đăng ký, đăng nhập, hồ sơ |
 | `/api/users` | Danh sách User (admin); `?role=` tùy chọn |
 | `/api/roles` | Quản lý vai trò |
@@ -533,7 +535,9 @@ errorMiddleware(err, req, res, next)
     "helmet": "^7.0.0",             // Security headers
     "morgan": "^1.10.0",            // HTTP logging
     "dotenv": "^16.3.1",            // Environment variables
-    "express-async-errors": "^3.1.1" // Async error handling
+    "express-async-errors": "^3.1.1", // Async error handling
+    "joi": "^17.x",                 // Request validation
+    "swagger-ui-express": "^5.x"    // Swagger UI (/api-docs)
   },
   "devDependencies": {
     "nodemon": "^3.0.1"             // Dev server auto-reload
@@ -581,11 +585,11 @@ NODE_ENV=development
 - [x] Automatic schedule closure
 - [x] Error middleware
 - [x] Request validation (Joi): middleware `validate.middleware.js`, schema cho `/api/auth`, `/api/appointments`
+- [x] API Documentation (Swagger UI: `/api-docs`, spec: `/openapi.json`, nguồn `src/docs/openapi.spec.js`)
 
 ### ❌ Cần Hoàn Thành
 - [ ] Unit Tests
 - [ ] Integration Tests
-- [ ] API Documentation (Swagger/OpenAPI)
 - [ ] Hoàn thiện Joi cho các route còn lại (đã có middleware + auth + appointments)
 - [ ] Email notifications
 - [ ] Payment gateway integration

@@ -3,6 +3,15 @@
 **Base URL mặc định:** `http://localhost:4000`  
 (Đổi port nếu trong `.env` có `PORT` khác.)
 
+**Tài liệu OpenAPI (Swagger):**
+
+| | Link |
+|---|------|
+| Giao diện thử API (Swagger UI) | `http://localhost:4000/api-docs` |
+| File spec JSON (OpenAPI 3) | `http://localhost:4000/openapi.json` |
+
+Trong Swagger UI, bấm **Authorize**, nhập `Bearer <token>` (hoặc chỉ token tùy phiên bản) để gọi các route cần JWT.
+
 **Header khi cần đăng nhập:**
 
 ```http
