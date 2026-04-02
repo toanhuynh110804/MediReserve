@@ -1,46 +1,72 @@
 import { useState } from 'react'
-import { useLocation, useNavigate } from 'react-router-dom'
+import { Link, useLocation, useNavigate } from 'react-router-dom'
 import { useAuth } from '../features/auth/useAuth'
 
 export function LoginPage() {
-  const [name, setName] = useState('Người dùng thử nghiệm')
-  const [role, setRole] = useState('patient')
+  const [email, setEmail] = useState('')
+  const [password, setPassword] = useState('')
+  const [loading, setLoading] = useState(false)
+  const [error, setError] = useState('')
   const { login } = useAuth()
   const navigate = useNavigate()
   const location = useLocation()
 
   const targetPath = location.state?.from || '/app'
 
-  const handleLogin = () => {
-    login({
-      token: `demo-token-${Date.now()}`,
-      user: {
-        id: 'demo-id',
-        name,
-        role,
-      },
-    })
-    navigate(targetPath, { replace: true })
+  const handleLogin = async (event) => {
+    event.preventDefault()
+    setError('')
+    setLoading(true)
+
+    try {
+      await login({ email, password })
+      navigate(targetPath, { replace: true })
+    } catch (requestError) {
+      setError(requestError.response?.data?.message || 'Đăng nhập thất bại, vui lòng thử lại.')
+    } finally {
+      setLoading(false)
+    }
   }
 
   return (
     <section>
-      <h1>Đăng nhập (Chế độ nền tảng)</h1>
+      <h1>Đăng nhập</h1>
       <p>
-        Đây là đăng nhập tạm cho chức năng #1 để kiểm tra auth guard. Chức năng #2 sẽ kết nối API /api/auth/login.
+        Sử dụng tài khoản thật từ backend để truy cập các trang bảo vệ.
       </p>
-      <div className="actions">
-        <input value={name} onChange={(event) => setName(event.target.value)} placeholder="Tên hiển thị" />
-        <select value={role} onChange={(event) => setRole(event.target.value)}>
-          <option value="patient">Bệnh nhân</option>
-          <option value="doctor">Bác sĩ</option>
-          <option value="staff">Nhân viên</option>
-          <option value="admin">Quản trị viên</option>
-        </select>
-        <button type="button" onClick={handleLogin}>
-          Đăng nhập với phiên thử nghiệm
-        </button>
-      </div>
+
+      <form className="auth-form" onSubmit={handleLogin}>
+        <label htmlFor="login-email">Email</label>
+        <input
+          id="login-email"
+          type="email"
+          value={email}
+          onChange={(event) => setEmail(event.target.value)}
+          placeholder="nhap-email@example.com"
+          required
+        />
+
+        <label htmlFor="login-password">Mật khẩu</label>
+        <input
+          id="login-password"
+          type="password"
+          value={password}
+          onChange={(event) => setPassword(event.target.value)}
+          placeholder="Nhập mật khẩu"
+          required
+        />
+
+        {error ? <p className="form-error">{error}</p> : null}
+
+        <div className="actions">
+          <button type="submit" disabled={loading}>
+            {loading ? 'Đang xử lý...' : 'Đăng nhập'}
+          </button>
+          <Link to="/register" className="secondary">
+            Chưa có tài khoản? Đăng ký
+          </Link>
+        </div>
+      </form>
     </section>
   )
 }

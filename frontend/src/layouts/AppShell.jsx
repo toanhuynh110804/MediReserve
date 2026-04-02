@@ -3,6 +3,12 @@ import { useAuth } from '../features/auth/useAuth'
 
 export function AppShell() {
   const { isAuthenticated, user, logout } = useAuth()
+  const roleLabelMap = {
+    patient: 'Bệnh nhân',
+    doctor: 'Bác sĩ',
+    staff: 'Nhân viên',
+    admin: 'Quản trị viên',
+  }
 
   return (
     <div className="app-shell">
@@ -15,6 +21,7 @@ export function AppShell() {
           <NavLink to="/app">Tổng quan</NavLink>
           <NavLink to="/admin">Quản trị</NavLink>
           {!isAuthenticated ? <NavLink to="/login">Đăng nhập</NavLink> : null}
+          {!isAuthenticated ? <NavLink to="/register">Đăng ký</NavLink> : null}
         </nav>
       </header>
 
@@ -25,7 +32,7 @@ export function AppShell() {
       {isAuthenticated ? (
         <div className="panel">
           <p>
-            Phiên đăng nhập: <strong>{user?.name || 'Người dùng chưa xác định'}</strong> ({user?.role || 'vai trò chưa xác định'})
+            Phiên đăng nhập: <strong>{user?.name || 'Người dùng chưa xác định'}</strong> ({roleLabelMap[user?.role] || 'Vai trò chưa xác định'})
           </p>
           <div className="actions">
             <button className="warn" onClick={logout} type="button">

@@ -4,6 +4,7 @@ import { RequireAuth } from '../features/auth/RequireAuth'
 import { RequireRole } from '../features/auth/RequireRole'
 import { HomePage } from '../pages/HomePage'
 import { LoginPage } from '../pages/LoginPage'
+import { RegisterPage } from '../pages/RegisterPage'
 import { DashboardPage } from '../pages/DashboardPage'
 import { AdminPage } from '../pages/AdminPage'
 import { UnauthorizedPage } from '../pages/UnauthorizedPage'
@@ -15,6 +16,7 @@ export function AppRouter() {
       <Route element={<AppShell />}>
         <Route path="/" element={<HomePage />} />
         <Route path="/login" element={<LoginPage />} />
+        <Route path="/register" element={<RegisterPage />} />
         <Route path="/unauthorized" element={<UnauthorizedPage />} />
 
         <Route element={<RequireAuth />}>

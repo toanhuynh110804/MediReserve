@@ -358,10 +358,34 @@ Muc tieu phan nay: Trien khai frontend theo cach chia nho, xong tung chuc nang r
   - npm run test: PASS (2/2 tests)
   - npm run build: PASS
 - Ghi chu:
-  - Login hien tai dang o che do foundation (demo session) de test guard.
-  - Chuc nang #2 se ket noi login/register voi backend /api/auth.
+  - Nen tang da duoc tai su dung cho chuc nang #2 ma khong pha vo router/guard.
 
-### Chuc nang #2 tro di
+### Chuc nang #2 - Authentication flow that
+- Trang thai: DONE
+- Pham vi hoan tat:
+  - Dang nhap that qua API `POST /api/auth/login`.
+  - Dang ky that qua API `POST /api/auth/register`.
+  - Bootstrap profile qua API `GET /api/auth/profile` khi co token.
+  - Bao ve route trong giai doan bootstrap phien (`Dang kiem tra phien dang nhap...`).
+  - Bo login demo, thay bang form that co xu ly loading/error.
+  - Bo sung route `/register` va lien ket dieu huong giua login/register.
+- File chinh da tao/cap nhat:
+  - frontend/src/shared/api/authApi.js
+  - frontend/src/features/auth/AuthProvider.jsx
+  - frontend/src/features/auth/RequireAuth.jsx
+  - frontend/src/pages/LoginPage.jsx
+  - frontend/src/pages/RegisterPage.jsx
+  - frontend/src/app/AppRouter.jsx
+  - frontend/.env.example
+- Ket qua test:
+  - npm run lint: PASS
+  - npm run test: PASS (2/2 tests)
+  - npm run build: PASS
+- Ghi chu:
+  - Auth flow da su dung du lieu backend that, khong con token demo.
+  - Role value van giu `patient|doctor|staff|admin` de tuong thich backend.
+
+### Chuc nang #3 tro di
 - Trang thai: CHUA BAT DAU
 
 ---
