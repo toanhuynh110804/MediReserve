@@ -1,8 +1,11 @@
+import { CatalogManager } from '../features/catalog/CatalogManager'
+
 export function AdminPage() {
   return (
-    <section>
-      <h1>Khu vực quản trị</h1>
-      <p>Trang này chỉ cho vai trò quản trị viên. Phân quyền route đã được kích hoạt ở bước #3.</p>
-    </section>
+    <CatalogManager
+      role="admin"
+      title="Khu vực quản trị"
+      description="Quản lý các danh mục hệ thống: bệnh viện, khoa, chuyên khoa, thuốc và bảo hiểm."
+    />
   )
 }

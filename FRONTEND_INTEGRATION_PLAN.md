@@ -612,9 +612,37 @@ Muc tieu phan nay: Trien khai frontend theo cach chia nho, xong tung chuc nang r
   - npm run test: PASS (92/92 tests)
   - npm run build: PASS
 
-### Chuc nang #10, #11, #13 tro di
+### Chuc nang #10 - Admin/Staff catalog modules
+- Trang thai: DONE
+- Pham vi hoan tat:
+  - Thay placeholder `AdminPage` va `StaffPage` bang catalog workspace co tab.
+  - Workspace quan ly 5 nhom danh muc: hospital, department, specialty, medicine, insurance.
+  - Nap du lieu dong bo tu backend: hospitals, departments, specialties, medicines, insurances, patients.
+  - Admin co the tao/cap nhat toan bo 5 danh muc va xoa theo rule backend.
+  - Staff co the xem toan bo danh muc, nhung chi tao/cap nhat medicine va insurance; nut xoa bi khoa neu khong du quyen.
+  - Department form su dung select hospital; Insurance form su dung select patient.
+  - Payload catalog duoc chuan hoa cho field nested address, number, date.
+  - Co danh sach bang + form tao/sua trong cung mot workspace de giam nhay trang.
+- File chinh da tao/cap nhat:
+  - frontend/src/shared/api/catalogApi.js
+  - frontend/src/shared/api/catalogApi.test.js
+  - frontend/src/shared/api/patientApi.js
+  - frontend/src/shared/api/patientApi.test.js
+  - frontend/src/features/catalog/catalogConfig.js
+  - frontend/src/features/catalog/catalogHelpers.js
+  - frontend/src/features/catalog/catalogHelpers.test.js
+  - frontend/src/features/catalog/CatalogManager.jsx
+  - frontend/src/features/catalog/CatalogManager.test.jsx
+  - frontend/src/pages/AdminPage.jsx
+  - frontend/src/pages/StaffPage.jsx
+- Ket qua test:
+  - npm run lint: PASS
+  - npm run test: PASS (108/108 tests)
+  - npm run build: PASS
+
+### Chuc nang #11, #13 tro di
 - Trang thai: CHUA BAT DAU
 
 ---
 Cap nhat: 2026-04-03
-Trang thai: Frontend da hoan thanh den chuc nang #9 (medical records + prescriptions)
+Trang thai: Frontend da hoan thanh den chuc nang #10 (admin/staff catalog modules)

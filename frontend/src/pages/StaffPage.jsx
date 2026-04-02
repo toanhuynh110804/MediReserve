@@ -1,8 +1,11 @@
+import { CatalogManager } from '../features/catalog/CatalogManager'
+
 export function StaffPage() {
   return (
-    <section>
-      <h1>Khu vực nhân viên</h1>
-      <p>Trang này dành riêng cho nhân viên. Các tác vụ vận hành sẽ được bổ sung theo từng bước.</p>
-    </section>
+    <CatalogManager
+      role="staff"
+      title="Khu vực nhân viên"
+      description="Theo dõi danh mục hệ thống và cập nhật thuốc, bảo hiểm theo quyền của nhân viên."
+    />
   )
 }
