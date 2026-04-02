@@ -1,5 +1,10 @@
 export const CATALOG_ORDER = ['hospital', 'department', 'specialty', 'medicine', 'insurance']
 
+export const CATALOG_SCOPE_GROUPS = {
+  admin: ['hospital', 'department', 'specialty'],
+  staff: ['medicine', 'insurance'],
+}
+
 export const CATALOG_CONFIG = {
   hospital: {
     label: 'Bệnh viện',
@@ -53,7 +58,7 @@ export const CATALOG_CONFIG = {
   },
   medicine: {
     label: 'Thuốc',
-    createRoles: ['admin', 'staff'],
+    createRoles: ['staff'],
     deleteRoles: ['admin'],
     fields: [
       { key: 'name', label: 'Tên thuốc', type: 'text', required: true },
@@ -71,7 +76,7 @@ export const CATALOG_CONFIG = {
   },
   insurance: {
     label: 'Bảo hiểm',
-    createRoles: ['admin', 'staff'],
+    createRoles: ['staff'],
     deleteRoles: ['admin'],
     fields: [
       { key: 'patient', label: 'Bệnh nhân', type: 'select', required: true, optionsKey: 'patients' },

@@ -29,10 +29,10 @@ export function AppRouter() {
           <Route path="/app" element={<RoleHomeRedirect />} />
           <Route path="/tong-quan" element={<DashboardPage />} />
           <Route path="/quan-ly-tep" element={<FileManagerPage />} />
-          <Route path="/thanh-toan" element={<BillingPage />} />
 
           <Route element={<RequireRole roles={['patient']} />}>
             <Route path="/benh-nhan" element={<PatientPage />} />
+            <Route path="/thanh-toan" element={<BillingPage />} />
           </Route>
 
           <Route element={<RequireRole roles={['doctor']} />}>

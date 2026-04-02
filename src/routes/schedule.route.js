@@ -5,9 +5,9 @@ const router = express.Router();
 
 router.use(authMiddleware);
 router.get('/', controller.getAll);
-router.post('/', authorize('admin', 'doctor', 'staff'), controller.create);
+router.post('/', authorize('admin'), controller.create);
 router.get('/:id', controller.getById);
-router.put('/:id', authorize('admin', 'doctor', 'staff'), controller.updateById);
-router.delete('/:id', authorize('admin', 'doctor', 'staff'), controller.deleteById);
+router.put('/:id', authorize('admin'), controller.updateById);
+router.delete('/:id', authorize('admin'), controller.deleteById);
 
 module.exports = router;

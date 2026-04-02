@@ -69,6 +69,12 @@ POST   /api/auth/login              - Đăng nhập
 GET    /api/auth/profile            - Lấy hồ sơ (yêu cầu token)
 ```
 
+**Ranh giới quyền giữa Admin và Nhân viên:**
+- `admin` quản trị hệ thống, không làm nghiệp vụ tiếp nhận trực tiếp. Admin quản lý nhân sự, bác sĩ, khoa/phòng, lịch làm việc bác sĩ, cấu hình hệ thống và xem toàn bộ lịch hẹn.
+- `staff` xử lý nghiệp vụ tiếp nhận bệnh nhân: tạo hồ sơ bệnh nhân, tìm kiếm bệnh nhân, tạo lịch khám cho bệnh nhân, xem danh sách lịch khám và cập nhật trạng thái tiếp nhận hoặc hủy.
+- `staff` không được tạo nhân viên, không được xóa bác sĩ và không được sửa cấu hình hệ thống.
+- Các route backend đã được siết lại để admin là vai trò quản trị, còn staff là vai trò vận hành hành chính.
+
 ---
 
 ### ✅ 2. Quản Lý Người Dùng (User Management)

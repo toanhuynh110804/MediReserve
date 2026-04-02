@@ -29,6 +29,7 @@ const ratingRoutes = require('./routes/rating.route');
 const addressRoutes = require('./routes/address.route');
 const medicineRoutes = require('./routes/medicine.route');
 const insuranceRoutes = require('./routes/insurance.route');
+const roomRoutes = require('./routes/room.route');
 
 const errorMiddleware = require('./middlewares/error.middleware');
 const { mountSwagger } = require('./config/swagger');
@@ -83,6 +84,7 @@ app.use('/api/ratings', ratingRoutes);
 app.use('/api/addresses', addressRoutes);
 app.use('/api/medicines', medicineRoutes);
 app.use('/api/insurances', insuranceRoutes);
+app.use('/api/rooms', roomRoutes);
 
 app.use(errorMiddleware);
 

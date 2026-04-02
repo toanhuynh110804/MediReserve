@@ -5,33 +5,32 @@ export function HomePage() {
   return (
     <section>
       <PageHero
-        eyebrow="MediReserve Workspace"
-        title="Điều phối khám chữa bệnh trên một giao diện thống nhất"
-        description="Frontend hiện đã nối toàn bộ luồng chính với backend thật: xác thực, bệnh nhân, bác sĩ, thanh toán, file, quản trị và vận hành nội bộ."
+        eyebrow="MediReserve"
+        title="Cổng truy cập hệ thống đặt lịch và điều phối khám bệnh"
+        description="Trang này dành cho khách truy cập và người dùng chưa đăng nhập. Sau khi đăng nhập, mỗi vai trò sẽ được đưa vào đúng khu vực làm việc riêng của mình."
         stats={[
-          { label: 'Tính năng frontend', value: '11/11' },
-          { label: 'Unit tests', value: '119' },
-          { label: 'Luồng E2E mục tiêu', value: '3' },
+          { label: 'Khách truy cập', value: 'Public' },
+          { label: 'Đăng nhập', value: 'Bắt buộc' },
+          { label: 'Điều hướng', value: 'Theo vai trò' },
         ]}
       />
 
       <div className="panel-grid two-columns">
         <div className="panel accent-panel">
-          <h2>Điểm vào nhanh</h2>
-          <p className="muted">Chọn luồng làm việc phù hợp với vai trò của bạn.</p>
+          <h2>Truy cập hệ thống</h2>
+          <p className="muted">Đăng nhập nếu bạn đã có tài khoản hoặc đăng ký tài khoản bệnh nhân mới.</p>
           <div className="actions">
             <Link to="/login">Đăng nhập</Link>
             <Link to="/register" className="secondary">Tạo tài khoản</Link>
-            <Link to="/tong-quan" className="secondary">Xem tổng quan</Link>
           </div>
         </div>
 
         <div className="panel soft-panel">
-          <h2>Những gì đã sẵn sàng</h2>
+          <h2>Các khu vực sau đăng nhập</h2>
           <ul className="feature-list">
-            <li>Đặt và hủy lịch với đồng bộ transaction-safe.</li>
-            <li>Workspace bác sĩ với hồ sơ y tế, đơn thuốc và realtime.</li>
-            <li>Quản trị danh mục, người dùng, nhân sự và role nội bộ.</li>
+            <li>Admin: quản trị bác sĩ, khoa phòng, lịch làm việc và phân quyền.</li>
+            <li>Bác sĩ: xem lịch làm việc, xử lý lịch hẹn và lập hồ sơ khám.</li>
+            <li>Nhân viên: tiếp nhận bệnh nhân và tạo lịch khám tại quầy.</li>
           </ul>
         </div>
       </div>

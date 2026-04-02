@@ -13,18 +13,24 @@ export function buildNavItems(isAuthenticated, role) {
     ]
   }
 
-  const authItems = [
-    { to: '/app', label: 'Điểm vào hệ thống' },
-    { to: '/quan-ly-tep', label: 'Quản lý tệp' },
-    { to: '/thanh-toan', label: 'Thanh toán' },
-  ]
-
-  if (role && ROLE_HOME_PATH[role]) {
-    authItems.push({ to: ROLE_HOME_PATH[role], label: 'Khu vực của tôi' })
+  const roleItems = {
+    [ROLES.admin]: [{ to: '/quan-tri', label: 'Quản trị' }],
+    [ROLES.doctor]: [{ to: '/bac-si', label: 'Khu bác sĩ' }],
+    [ROLES.staff]: [{ to: '/nhan-vien', label: 'Khu nhân viên' }],
+    [ROLES.patient]: [
+      { to: '/benh-nhan', label: 'Khu bệnh nhân' },
+      { to: '/thanh-toan', label: 'Thanh toán' },
+    ],
   }
 
-  if (role === ROLES.admin && ROLE_HOME_PATH[role] !== '/quan-tri') {
-    authItems.push({ to: '/quan-tri', label: 'Quản trị' })
+  const authItems = roleItems[role] || []
+
+  if (role && ROLE_HOME_PATH[role] && !authItems.some((item) => item.to === ROLE_HOME_PATH[role])) {
+    authItems.unshift({ to: ROLE_HOME_PATH[role], label: 'Khu vực của tôi' })
+  }
+
+  if (role && role !== ROLES.patient) {
+    authItems.push({ to: '/quan-ly-tep', label: 'Tệp đính kèm' })
   }
 
   return [...publicItems, ...authItems]

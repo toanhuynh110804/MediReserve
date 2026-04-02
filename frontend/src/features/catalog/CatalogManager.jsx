@@ -50,8 +50,9 @@ const MUTATIONS = {
   insurance: { create: createInsuranceApi, update: updateInsuranceApi, delete: deleteInsuranceApi },
 }
 
-export function CatalogManager({ role, title, description }) {
-  const [activeTab, setActiveTab] = useState('hospital')
+export function CatalogManager({ role, title, description, catalogKeys = CATALOG_ORDER }) {
+  const availableCatalogKeys = catalogKeys.length > 0 ? catalogKeys : CATALOG_ORDER
+  const [activeTab, setActiveTab] = useState(() => availableCatalogKeys[0])
   const [catalogData, setCatalogData] = useState({
     hospitals: [],
     departments: [],
@@ -65,13 +66,24 @@ export function CatalogManager({ role, title, description }) {
   const [error, setError] = useState('')
   const [message, setMessage] = useState('')
   const [editingItem, setEditingItem] = useState(null)
-  const [formState, setFormState] = useState(() => getEmptyFormState('hospital'))
+  const [formState, setFormState] = useState(() => getEmptyFormState(availableCatalogKeys[0]))
 
   const currentConfig = CATALOG_CONFIG[activeTab]
   const currentDatasetKey = getCatalogDatasetKey(activeTab)
   const currentItems = catalogData[currentDatasetKey] || []
   const canManage = canManageCatalog(role, activeTab)
   const canDelete = canDeleteCatalogItem(role, activeTab)
+
+  useEffect(() => {
+    if (!availableCatalogKeys.includes(activeTab)) {
+      const fallbackTab = availableCatalogKeys[0]
+      setActiveTab(fallbackTab)
+      setEditingItem(null)
+      setFormState(getEmptyFormState(fallbackTab))
+      setError('')
+      setMessage('')
+    }
+  }, [activeTab, availableCatalogKeys])
 
   const loadCatalogs = useCallback(async () => {
     setLoading(true)
@@ -199,7 +211,7 @@ export function CatalogManager({ role, title, description }) {
       {message && <p className="muted">{message}</p>}
 
       <div className="actions" style={{ flexWrap: 'wrap', marginBottom: '1rem' }}>
-        {CATALOG_ORDER.map((tabKey) => (
+        {availableCatalogKeys.map((tabKey) => (
           <button
             key={tabKey}
             type="button"

@@ -14,6 +14,7 @@ describe('catalogHelpers', () => {
     expect(canManageCatalog('admin', 'hospital')).toBe(true)
     expect(canManageCatalog('staff', 'hospital')).toBe(false)
     expect(canManageCatalog('staff', 'medicine')).toBe(true)
+    expect(canManageCatalog('admin', 'medicine')).toBe(false)
     expect(canDeleteCatalogItem('staff', 'medicine')).toBe(false)
     expect(canDeleteCatalogItem('admin', 'insurance')).toBe(true)
   })

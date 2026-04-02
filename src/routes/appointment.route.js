@@ -15,20 +15,20 @@ router.use(authMiddleware);
 router.get('/', validate({ query: listQuerySchema }), controller.getAll);
 router.post(
   '/',
-  authorize('patient', 'admin', 'staff'),
+  authorize('patient', 'staff'),
   validate({ body: createSchema }),
   controller.create
 );
 router.get('/:id', validate({ params: idParamSchema }), controller.getById);
 router.put(
   '/:id',
-  authorize('admin', 'staff', 'doctor'),
+  authorize('staff', 'doctor'),
   validate({ params: idParamSchema, body: updateSchema }),
   controller.updateById
 );
 router.post(
   '/:id/cancel',
-  authorize('patient', 'admin', 'staff', 'doctor'),
+  authorize('patient', 'staff', 'doctor'),
   validate({ params: idParamSchema, body: cancelBodySchema }),
   controller.cancel
 );

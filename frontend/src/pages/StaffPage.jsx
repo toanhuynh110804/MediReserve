@@ -1,11 +1,5 @@
-import { CatalogManager } from '../features/catalog/CatalogManager'
+import { StaffOperationsPanel } from '../features/staff/StaffOperationsPanel'
 
 export function StaffPage() {
-  return (
-    <CatalogManager
-      role="staff"
-      title="Khu vực nhân viên"
-      description="Theo dõi danh mục hệ thống và cập nhật thuốc, bảo hiểm theo quyền của nhân viên."
-    />
-  )
+  return <StaffOperationsPanel />
 }

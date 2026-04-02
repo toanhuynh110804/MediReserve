@@ -43,6 +43,7 @@ export function DoctorPage() {
   const [error, setError] = useState('')
   const [message, setMessage] = useState('')
   const [statusFilter, setStatusFilter] = useState('all')
+  const [activeSection, setActiveSection] = useState('schedule')
   const latestSyncRequestIdRef = useRef(0)
 
   const doctorUserId = user?._id || user?.id
@@ -213,17 +214,39 @@ export function DoctorPage() {
   return (
     <section>
       <h1>Khu vực bác sĩ</h1>
-      <p>Quản lý lịch làm việc và lịch hẹn bệnh nhân của bạn.</p>
+      <p>Bác sĩ chỉ nhìn thấy lịch làm việc của mình, lịch hẹn bệnh nhân và workspace hồ sơ khám.</p>
 
       {error && <p className="form-error">{error}</p>}
       {message && <p className="muted">{message}</p>}
 
-      <div className="actions">
+      <div className="actions" style={{ flexWrap: 'wrap' }}>
         <button type="button" onClick={fetchData} disabled={loading || updating}>
           {loading ? 'Đang tải...' : 'Làm mới'}
         </button>
+        <button
+          type="button"
+          onClick={() => setActiveSection('schedule')}
+          style={activeSection === 'schedule' ? { backgroundColor: '#0f766e', color: '#fff' } : undefined}
+        >
+          Lịch làm việc
+        </button>
+        <button
+          type="button"
+          onClick={() => setActiveSection('appointments')}
+          style={activeSection === 'appointments' ? { backgroundColor: '#0f766e', color: '#fff' } : undefined}
+        >
+          Lịch hẹn bệnh nhân
+        </button>
+        <button
+          type="button"
+          onClick={() => setActiveSection('clinical')}
+          style={activeSection === 'clinical' ? { backgroundColor: '#0f766e', color: '#fff' } : undefined}
+        >
+          Hồ sơ khám
+        </button>
       </div>
 
+      {activeSection === 'schedule' ? (
       <div className="panel">
         <h2>Lịch làm việc của tôi</h2>
         {schedules.length === 0 ? (
@@ -236,7 +259,9 @@ export function DoctorPage() {
           </div>
         )}
       </div>
+      ) : null}
 
+      {activeSection === 'appointments' ? (
       <div className="panel">
         <h2>Lịch hẹn của bệnh nhân</h2>
         <p className="muted">Chọn nút "Hồ sơ khám" trên lịch hẹn đã xác nhận hoặc hoàn thành để lập hồ sơ và kê đơn.</p>
@@ -283,7 +308,10 @@ export function DoctorPage() {
           </table>
         )}
       </div>
+      ) : null}
 
+      {activeSection === 'clinical' ? (
+      <>
       <div className="panel">
         <h2>Workspace hồ sơ khám</h2>
         {!selectedAppointment ? (
@@ -326,6 +354,8 @@ export function DoctorPage() {
         onSubmit={handlePrescriptionSubmit}
         disabled={loading || updating || !doctorId}
       />
+      </>
+      ) : null}
     </section>
   )
 }
