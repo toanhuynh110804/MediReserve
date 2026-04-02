@@ -663,9 +663,42 @@ Muc tieu phan nay: Trien khai frontend theo cach chia nho, xong tung chuc nang r
   - npm run test: PASS (119/119 tests)
   - npm run build: PASS
 
-### Chuc nang #13 tro di
-- Trang thai: CHUA BAT DAU
+### Chuc nang #13 - Hoan thien UX, E2E, toi uu hieu nang
+- Trang thai: DONE
+- Pham vi hoan tat:
+  - Nang cap shell giao dien voi skip-link, footer thong tin ky thuat, session panel ro rang hon.
+  - Bo sung `PageHero` va `StateNotice` de thong nhat hero, empty/loading/error feedback tren cac trang chinh.
+  - Cai tien HomePage, DashboardPage, BillingPage, FileManagerPage theo huong ro thong tin hon va than thien mobile hon.
+  - Thay alert blocking tren Dashboard bang trang thai inline co the theo doi lai.
+  - Bo sung style cho tabs, tables, textarea, focus state, stat cards va panel grid.
+  - Thiet lap Playwright (`playwright.config.js`, script `test:e2e`, `test:e2e:ui`).
+  - Viet 3 luong E2E voi mocked network de khong phu thuoc backend runtime:
+    - login redirect theo role patient,
+    - patient booking flow,
+    - admin catalog + user management flow.
+  - Tach biet unit tests (`src/**/*`) va E2E tests (`tests/e2e/**`) trong cau hinh Vite/Vitest.
+- File chinh da tao/cap nhat:
+  - frontend/src/shared/components/PageHero.jsx
+  - frontend/src/shared/components/StateNotice.jsx
+  - frontend/src/layouts/AppShell.jsx
+  - frontend/src/pages/HomePage.jsx
+  - frontend/src/pages/DashboardPage.jsx
+  - frontend/src/pages/BillingPage.jsx
+  - frontend/src/pages/FileManagerPage.jsx
+  - frontend/src/index.css
+  - frontend/vite.config.js
+  - frontend/playwright.config.js
+  - frontend/tests/e2e/helpers.js
+  - frontend/tests/e2e/auth-flow.spec.js
+  - frontend/tests/e2e/patient-booking.spec.js
+  - frontend/tests/e2e/admin-management.spec.js
+  - frontend/package.json
+- Ket qua test:
+  - npm run lint: PASS
+  - npm run test: PASS (119/119 tests)
+  - npm run build: PASS
+  - npm run test:e2e: PASS (3/3 tests)
 
 ---
 Cap nhat: 2026-04-03
-Trang thai: Frontend da hoan thanh den chuc nang #11 (staff/users/roles management)
+Trang thai: Frontend da hoan thanh den chuc nang #13 (polish + E2E)

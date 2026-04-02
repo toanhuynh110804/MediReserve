@@ -2,6 +2,8 @@ import { useCallback, useEffect, useState } from 'react'
 import { getFilesApi } from '../shared/api/fileApi'
 import { UploadForm } from '../features/files/UploadForm'
 import { FileList } from '../features/files/FileList'
+import { PageHero } from '../shared/components/PageHero'
+import { StateNotice } from '../shared/components/StateNotice'
 
 export function FileManagerPage() {
   const [files, setFiles] = useState([])
@@ -36,10 +38,21 @@ export function FileManagerPage() {
 
   return (
     <section>
-      <h1>Quản lý tệp</h1>
-      <p>Tải lên, xem và quản lý các tệp của bạn.</p>
+      <PageHero
+        eyebrow="Files"
+        title="Quản lý tệp"
+        description="Tải lên, xem và quản lý các tệp đính kèm theo dữ liệu thật từ backend upload multipart."
+        stats={[
+          { label: 'Tệp hiện có', value: files.length },
+          { label: 'Trạng thái', value: loading ? 'Đang tải' : 'Sẵn sàng' },
+        ]}
+      />
 
-      {error && <p className="form-error">{error}</p>}
+      {error ? (
+        <StateNotice tone="error" title="Tải danh sách thất bại">
+          {error}
+        </StateNotice>
+      ) : null}
 
       <div className="actions">
         <button type="button" onClick={fetchFiles} disabled={loading}>

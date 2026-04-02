@@ -44,6 +44,21 @@ a {
   padding: 24px 16px 40px;
 }
 
+.skip-link {
+  position: absolute;
+  left: 16px;
+  top: -40px;
+  background: var(--brand-strong);
+  color: #fff;
+  padding: 8px 12px;
+  border-radius: 999px;
+  z-index: 5;
+}
+
+.skip-link:focus {
+  top: 16px;
+}
+
 .topbar {
   display: flex;
   justify-content: space-between;
@@ -61,6 +76,14 @@ a {
   font-weight: 700;
   letter-spacing: 0.4px;
   color: var(--brand-strong);
+  display: block;
+  font-size: 1.2rem;
+}
+
+.topbar-subtitle {
+  margin-top: 6px;
+  max-width: 420px;
+  font-size: 0.92rem;
 }
 
 .nav {
@@ -92,6 +115,10 @@ a {
   box-shadow: var(--shadow);
 }
 
+.shell-main {
+  overflow: hidden;
+}
+
 h1 {
   margin: 0 0 10px;
   font-family: 'Space Grotesk', sans-serif;
@@ -106,6 +133,77 @@ p {
 .muted {
   margin-top: 12px;
   font-size: 14px;
+}
+
+.eyebrow {
+  margin-bottom: 8px;
+  color: var(--brand-strong);
+  font-size: 0.78rem;
+  font-weight: 700;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+}
+
+.hero-copy {
+  max-width: 760px;
+  font-size: 1rem;
+  line-height: 1.7;
+}
+
+.page-hero {
+  position: relative;
+}
+
+.hero-stats,
+.panel-grid {
+  display: grid;
+  gap: 14px;
+  margin-top: 18px;
+}
+
+.hero-stats {
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+}
+
+.panel-grid.two-columns {
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+}
+
+.hero-stat-card {
+  border: 1px solid var(--line);
+  border-radius: 16px;
+  padding: 16px;
+  background: linear-gradient(180deg, #ffffff, #f7fbfb);
+}
+
+.hero-stat-card strong {
+  display: block;
+  font-size: 1.5rem;
+  color: var(--brand-strong);
+  font-family: 'Space Grotesk', sans-serif;
+}
+
+.hero-stat-card span {
+  margin-top: 4px;
+  display: block;
+  color: var(--text-soft);
+  font-size: 0.92rem;
+}
+
+.accent-panel {
+  background: linear-gradient(135deg, rgba(15, 139, 141, 0.09), rgba(255, 122, 89, 0.08));
+}
+
+.soft-panel {
+  background: linear-gradient(180deg, #ffffff, #fbf6f1);
+}
+
+.feature-list {
+  margin: 16px 0 0;
+  padding-left: 18px;
+  color: var(--text-soft);
+  display: grid;
+  gap: 10px;
 }
 
 .actions {
@@ -134,6 +232,17 @@ button.warn {
   background: var(--danger);
 }
 
+button.active,
+.tabs button.active {
+  background: var(--brand-strong);
+  color: #fff;
+}
+
+button:hover:not(:disabled),
+.nav a:hover {
+  transform: translateY(-1px);
+}
+
 input {
   width: 100%;
   max-width: 300px;
@@ -152,6 +261,22 @@ select {
   border-radius: 10px;
   padding: 10px 12px;
   background: #fff;
+}
+
+textarea {
+  width: 100%;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  padding: 10px 12px;
+  resize: vertical;
+  font: inherit;
+}
+
+input:focus,
+select:focus,
+textarea:focus {
+  border-color: var(--brand);
+  outline: 2px solid rgba(15, 139, 141, 0.12);
 }
 
 .actions a {
@@ -195,6 +320,78 @@ select {
   font-size: 14px;
 }
 
+.state-notice {
+  margin-top: 14px;
+  border-radius: 14px;
+  padding: 14px 16px;
+  display: grid;
+  gap: 6px;
+  border: 1px solid var(--line);
+}
+
+.state-notice strong {
+  color: var(--text);
+}
+
+.state-notice-info {
+  background: #f5fbfb;
+}
+
+.state-notice-success {
+  background: #eef8f2;
+  border-color: #b8dec4;
+}
+
+.state-notice-error {
+  background: #fff4f2;
+  border-color: #f0c0ba;
+}
+
+.tabs {
+  margin-top: 18px;
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.tabs button {
+  background: #eef6f6;
+  color: var(--brand-strong);
+}
+
+.session-panel,
+.app-footer {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  align-items: center;
+}
+
+.session-copy {
+  color: var(--text-soft);
+}
+
+.app-footer {
+  margin-top: 14px;
+  padding: 8px 4px 0;
+  color: var(--text-soft);
+  font-size: 0.85rem;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 14px;
+}
+
+th,
+td {
+  text-align: left;
+  padding: 12px 10px;
+  border-bottom: 1px solid var(--line);
+  vertical-align: top;
+}
+
 button:disabled {
   opacity: 0.65;
   cursor: not-allowed;
@@ -204,6 +401,16 @@ button:disabled {
   .topbar {
     flex-direction: column;
     align-items: flex-start;
+  }
+
+  .session-panel,
+  .app-footer {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .panel {
+    padding: 18px;
   }
 
   h1 {

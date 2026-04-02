@@ -4,6 +4,8 @@ import { getPaymentsApi } from '../shared/api/paymentApi'
 import { useAuth } from '../features/auth/useAuth'
 import { InvoiceCard } from '../features/billing/InvoiceCard'
 import { PaymentRow } from '../features/billing/PaymentRow'
+import { PageHero } from '../shared/components/PageHero'
+import { StateNotice } from '../shared/components/StateNotice'
 
 export function BillingPage() {
   const { user } = useAuth()
@@ -39,10 +41,22 @@ export function BillingPage() {
 
   return (
     <section>
-      <h1>Quản lý thanh toán</h1>
-      <p>Xem hóa đơn và lịch sử thanh toán của bạn.</p>
+      <PageHero
+        eyebrow="Billing"
+        title="Quản lý thanh toán"
+        description="Theo dõi hóa đơn, lịch sử thanh toán và đối chiếu trạng thái thu phí của bạn theo dữ liệu backend thật."
+        stats={[
+          { label: 'Hóa đơn', value: invoices.length },
+          { label: 'Thanh toán', value: payments.length },
+          { label: 'Tab hiện tại', value: activeTab === 'invoices' ? 'Hóa đơn' : 'Thanh toán' },
+        ]}
+      />
 
-      {error && <p className="form-error">{error}</p>}
+      {error ? (
+        <StateNotice tone="error" title="Tải dữ liệu thất bại">
+          {error}
+        </StateNotice>
+      ) : null}
 
       <div className="actions">
         <button type="button" onClick={fetchData} disabled={loading}>
