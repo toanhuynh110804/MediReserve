@@ -1,4 +1,6 @@
 const dotenv = require('dotenv');
+const http = require('http');
+const { Server } = require('socket.io');
 const app = require('./app');
 const connectDB = require('./config/db');
 
@@ -8,7 +10,24 @@ const PORT = process.env.PORT || 4000;
 
 connectDB()
   .then(() => {
-    const server = app.listen(PORT, () => {
+    const server = http.createServer(app);
+    const io = new Server(server, {
+      cors: {
+        origin: process.env.CLIENT_ORIGIN || '*',
+      },
+    });
+
+    app.set('io', io);
+
+    io.on('connection', (socket) => {
+      socket.on('join-user-room', (payload = {}) => {
+        if (payload.userId) {
+          socket.join(`user:${payload.userId}`);
+        }
+      });
+    });
+
+    server.listen(PORT, () => {
       console.log(`Server started on http://localhost:${PORT}`);
     });
 

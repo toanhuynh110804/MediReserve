@@ -13,6 +13,9 @@
 Framework:     Express.js (Node.js)
 Database:      MongoDB (NoSQL)
 Authentication: JWT + bcryptjs
+Realtime:      Socket.IO
+Upload:        Multer (local storage: /uploads)
+Transaction:   Mongoose session/withTransaction
 API Security:  CORS, Helmet
 Logging:       Morgan
 Environment:   dotenv
@@ -31,6 +34,7 @@ MediReserve/
 │   ├── routes/                   # 20+ API endpoints
 │   └── middlewares/
 │       ├── auth.middleware.js    # JWT & Role authorization
+│       ├── upload.middleware.js  # Multer file upload
 │       └── error.middleware.js   # Error handling
 ├── package.json
 ├── .env.example
@@ -207,7 +211,7 @@ POST   /api/appointments           - Đặt lịch hẹn
 GET    /api/appointments           - Xem danh sách (theo user role)
 GET    /api/appointments/:id       - Xem chi tiết
 PUT    /api/appointments/:id       - Cập nhật
-DELETE /api/appointments/:id/cancel - Hủy lịch
+POST   /api/appointments/:id/cancel - Hủy lịch
 ```
 
 ---
@@ -537,6 +541,8 @@ errorMiddleware(err, req, res, next)
     "dotenv": "^16.3.1",            // Environment variables
     "express-async-errors": "^3.1.1", // Async error handling
     "joi": "^17.x",                 // Request validation
+    "multer": "^2.x",               // Multipart file upload
+    "socket.io": "^4.x",            // Realtime communication
     "swagger-ui-express": "^5.x"    // Swagger UI (/api-docs)
   },
   "devDependencies": {
@@ -587,6 +593,9 @@ NODE_ENV=development
 - [x] Request validation (Joi): middleware `validate.middleware.js`, schema cho `/api/auth`, `/api/appointments`
 - [x] API Documentation (Swagger UI: `/api-docs`, spec: `/openapi.json`, nguồn `src/docs/openapi.spec.js`)
 - [x] API smoke test tự động cho toàn bộ route chính (`npm run test:api-smoke`, pass 32/32)
+- [x] File upload storage thực tế bằng `multer` (multipart), lưu local tại `/uploads`, phục vụ static qua `GET /uploads/*`
+- [x] Database transaction cho luồng đặt/hủy lịch hẹn bằng `mongoose.startSession()` + `withTransaction()`
+- [x] Realtime socket bằng `socket.io` (emit sự kiện `appointment:created`, `appointment:cancelled`)
 - [x] Sửa lỗi backend được phát hiện qua smoke test:
   - [x] `review.controller.js`: map đúng `Patient._id` thay vì `User._id`
   - [x] `rating.controller.js`: map đúng `Patient._id` cho user role `patient`
@@ -598,7 +607,6 @@ NODE_ENV=development
 - [ ] Hoàn thiện Joi cho các route còn lại (đã có middleware + auth + appointments)
 - [ ] Email notifications
 - [ ] Payment gateway integration
-- [ ] File upload storage
 - [ ] Database indexing optimization
 - [ ] Logging system
 - [ ] Rate limiting
@@ -660,9 +668,13 @@ GET / → { success: true, message: 'MediReserve API is running' }
 
 3. **Auto-cascade**: Khi appointment được tạo, schedule.bookedCount tự động tăng
 
-4. **Email chưa được setup**: Nên thêm email notifications cho các sự kiện quan trọng
+4. **Transaction đã bật cho appointment**: Luồng create/cancel được bọc transaction để đồng bộ appointment và schedule.
 
-5. **Payment integration**: Hiện tại chỉ lưu trữ payment info, chưa tích hợp payment gateway thực
+5. **Realtime đã bật**: Hệ thống có socket event cho thay đổi lịch hẹn (`appointment:created`, `appointment:cancelled`).
+
+6. **Email chưa được setup**: Nên thêm email notifications cho các sự kiện quan trọng
+
+7. **Payment integration**: Hiện tại chỉ lưu trữ payment info, chưa tích hợp payment gateway thực
 
 ---
 
