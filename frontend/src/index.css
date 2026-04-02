@@ -1,0 +1,188 @@
+@import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;700&family=Plus+Jakarta+Sans:wght@400;500;600&display=swap');
+
+:root {
+  --bg: #f7fbfb;
+  --bg-panel: #ffffff;
+  --text: #1c2a30;
+  --text-soft: #4f666f;
+  --line: #d9e7ea;
+  --brand: #0f8b8d;
+  --brand-strong: #126e70;
+  --accent: #ff7a59;
+  --danger: #c63b33;
+  --shadow: 0 10px 30px rgba(21, 58, 69, 0.1);
+  --radius: 14px;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  min-height: 100vh;
+  font-family: 'Plus Jakarta Sans', sans-serif;
+  color: var(--text);
+  background:
+    radial-gradient(circle at 8% 10%, #dff5f0, transparent 36%),
+    radial-gradient(circle at 92% 88%, #ffe4dc, transparent 34%),
+    var(--bg);
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
+#root {
+  min-height: 100vh;
+}
+
+.app-shell {
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 24px 16px 40px;
+}
+
+.topbar {
+  display: flex;
+  justify-content: space-between;
+  gap: 14px;
+  align-items: center;
+  background: var(--bg-panel);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  padding: 14px 16px;
+  box-shadow: var(--shadow);
+}
+
+.brand {
+  font-family: 'Space Grotesk', sans-serif;
+  font-weight: 700;
+  letter-spacing: 0.4px;
+  color: var(--brand-strong);
+}
+
+.nav {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.nav a {
+  border: 1px solid var(--line);
+  padding: 8px 12px;
+  border-radius: 999px;
+  background: #fff;
+  color: var(--text-soft);
+}
+
+.nav a.active {
+  border-color: var(--brand);
+  color: var(--brand-strong);
+  background: #ecf9f7;
+}
+
+.panel {
+  margin-top: 14px;
+  background: var(--bg-panel);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  padding: 24px;
+  box-shadow: var(--shadow);
+}
+
+h1 {
+  margin: 0 0 10px;
+  font-family: 'Space Grotesk', sans-serif;
+  font-size: 32px;
+}
+
+p {
+  margin: 0;
+  color: var(--text-soft);
+}
+
+.muted {
+  margin-top: 12px;
+  font-size: 14px;
+}
+
+.actions {
+  margin-top: 18px;
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+button {
+  border: none;
+  border-radius: 10px;
+  padding: 10px 14px;
+  font-weight: 600;
+  cursor: pointer;
+  background: var(--brand);
+  color: #fff;
+}
+
+button.secondary {
+  background: #ecf4f5;
+  color: var(--brand-strong);
+}
+
+button.warn {
+  background: var(--danger);
+}
+
+input {
+  width: 100%;
+  max-width: 300px;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  padding: 10px 12px;
+  outline: none;
+}
+
+input:focus {
+  border-color: var(--brand);
+}
+
+select {
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  padding: 10px 12px;
+  background: #fff;
+}
+
+.actions a {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 10px;
+  padding: 10px 14px;
+  font-weight: 600;
+}
+
+.actions a.secondary {
+  background: #ecf4f5;
+  color: var(--brand-strong);
+}
+
+.status-box {
+  margin-top: 14px;
+  border: 1px dashed var(--line);
+  padding: 12px;
+  border-radius: 10px;
+  background: #fcfefe;
+}
+
+@media (max-width: 768px) {
+  .topbar {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  h1 {
+    font-size: 26px;
+  }
+}
