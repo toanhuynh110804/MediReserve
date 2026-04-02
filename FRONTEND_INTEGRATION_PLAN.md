@@ -475,9 +475,109 @@ Muc tieu phan nay: Trien khai frontend theo cach chia nho, xong tung chuc nang r
   - npm run test: PASS (49/49 tests)
   - npm run build: PASS
 
-### Chuc nang #8 tro di
+### Chuc nang #6 - Realtime socket integration
+- Trang thai: DONE
+- Pham vi hoan tat:
+  - Socket client connect/disconnect theo trang thai dang nhap.
+  - Ket noi socket trong AuthProvider, tro ket noi khi logout.
+  - Lang nghe event: appointment:created va appointment:cancelled.
+  - Khi nhan event, trigger refetch (khong cap nhat state ao).
+  - Setup subscribe helper trong component can dung socket.
+- File chinh da tao/cap nhat:
+  - frontend/src/shared/realtime/socketService.js
+  - frontend/src/features/auth/AuthProvider.jsx
+  - frontend/src/pages/PatientPage.jsx
+- Ket qua test:
+  - npm run lint: PASS
+  - npm run test: PASS (15/15 tests)
+  - npm run build: PASS
+
+### Chuc nang #7 - File upload multipart
+- Trang thai: DONE
+- Pham vi hoan tat:
+  - Upload file qua API `POST /api/files` voi multipart/form-data.
+  - Danh sach file da upload qua API `GET /api/files`.
+  - Xoa file qua API `DELETE /api/files/:id`.
+  - Hien thi form upload voi input file, button submit, loading state.
+  - Hien thi danh sach file voi ten, kich thuoc, link download, button xoa.
+  - Xu li loi upload bang thong bao user-friendly.
+- File chinh da tao/cap nhat:
+  - frontend/src/shared/api/fileApi.js
+  - frontend/src/shared/api/fileApi.test.js
+  - frontend/src/features/files/UploadForm.jsx
+  - frontend/src/features/files/UploadForm.test.jsx
+  - frontend/src/features/files/FileList.jsx
+  - frontend/src/features/files/FileList.test.jsx
+  - frontend/src/pages/FileManagerPage.jsx
+  - frontend/src/app/AppRouter.jsx (route /quan-ly-tep)
+  - frontend/src/layouts/navItems.js (them link)
+- Ket qua test:
+  - npm run lint: PASS
+  - npm run test: PASS (30/30 tests)
+  - npm run build: PASS
+
+### Chuc nang #12 - Invoice/Payment views
+- Trang thai: DONE
+- Pham vi hoan tat:
+  - Xem danh sach hoa don cua benh nhan (GET /api/invoices?patient=userId).
+  - Xem danh sach thanh toan cua benh nhan (GET /api/payments?patient=userId).
+  - Tab interface: chuyen giua "Hoa don" va "Thanh toan".
+  - Hien thi chi tiet: so tien, ngay tao, trang thai (mau sac theo trang thai).
+  - Format tien te VND, dinh dang ngay gio Vietnam.
+  - Route: /thanh-toan (accessible cho all authenticated roles).
+  - Menu: them link "Thanh toan" cho tat ca user dang nhap.
+  - Upload file: thanh toán là view-only (không edit, không tạo mới từ frontend).
+- File chinh da tao/cap nhat:
+  - frontend/src/shared/api/invoiceApi.js
+  - frontend/src/shared/api/invoiceApi.test.js
+  - frontend/src/shared/api/paymentApi.js
+  - frontend/src/shared/api/paymentApi.test.js
+  - frontend/src/features/billing/billingHelpers.js
+  - frontend/src/features/billing/InvoiceCard.jsx
+  - frontend/src/features/billing/InvoiceCard.test.jsx
+  - frontend/src/features/billing/PaymentRow.jsx
+  - frontend/src/features/billing/PaymentRow.test.jsx
+  - frontend/src/pages/BillingPage.jsx
+  - frontend/src/app/AppRouter.jsx (route /thanh-toan)
+  - frontend/src/layouts/navItems.js (them link)
+  - frontend/src/layouts/navItems.test.js (cap nhat test)
+- Ket qua test:
+  - npm run lint: PASS
+  - npm run test: PASS (49/49 tests)
+  - npm run build: PASS
+
+### Chuc nang #8 - Doctor workspace
+- Trang thai: DONE
+- Pham vi hoan tat:
+  - Xem lich lam viec cua bac si (GET /api/schedules).
+  - Xem danh sach benh nhan hen kham (GET /api/appointments).
+  - Cap nhat trang thai lich hen (PUT /api/appointments/:id) voi cac trang thai:
+    - pending -> confirmed / cancelled
+    - confirmed -> completed / cancelled
+  - Huy lich hen (POST /api/appointments/:id/cancel).
+  - Hien thi danh sach lich lam (schedules) voi ngay, slot, suc chua, so bon, slot con trong, phong.
+  - Hien thi bang lich hen cua benh nhan (appointments) voi ten benh nhan, ngay, trang thai, button hanh dong.
+  - Filter danh sach lich hen theo trang thai (pending/confirmed/completed/cancelled).
+  - Ket noi socket de nhan su kien appointment:created, appointment:cancelled, trigger refetch.
+  - State machine validation: che do chuyen trang thai (pending khong the sang completed truc tiep).
+- File chinh da tao/cap nhat:
+  - frontend/src/shared/api/doctorApi.js
+  - frontend/src/shared/api/doctorApi.test.js
+  - frontend/src/features/doctor/appointmentHelpers.js
+  - frontend/src/features/doctor/appointmentHelpers.test.js
+  - frontend/src/features/doctor/DoctorScheduleCard.jsx
+  - frontend/src/features/doctor/DoctorScheduleCard.test.jsx
+  - frontend/src/features/doctor/AppointmentActionRow.jsx
+  - frontend/src/features/doctor/AppointmentActionRow.test.jsx
+  - frontend/src/pages/DoctorPage.jsx
+- Ket qua test:
+  - npm run lint: PASS
+  - npm run test: PASS (66/66 tests)
+  - npm run build: PASS
+
+### Chuc nang #9, #10, #11, #13 tro di
 - Trang thai: CHUA BAT DAU
 
 ---
-Cap nhat: 2026-04-02
-Trang thai: Frontend da hoan thanh den chuc nang #12 (invoice/payment views)
+Cap nhat: 2026-04-03
+Trang thai: Frontend da hoan thanh den chuc nang #8 (doctor workspace)
