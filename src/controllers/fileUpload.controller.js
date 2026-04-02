@@ -31,6 +31,6 @@ exports.deleteById = async (req, res) => {
   const file = await FileUpload.findById(req.params.id);
   if (!file) return res.status(404).json({ message: 'File không tồn tại' });
   if (!file.owner.equals(req.user._id) && req.user.role !== 'admin') return res.status(403).json({ message: 'Không có quyền truy cập' });
-  await file.remove();
+  await file.deleteOne();
   res.json({ message: 'Xóa file thành công' });
 };

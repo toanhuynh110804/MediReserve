@@ -586,6 +586,11 @@ NODE_ENV=development
 - [x] Error middleware
 - [x] Request validation (Joi): middleware `validate.middleware.js`, schema cho `/api/auth`, `/api/appointments`
 - [x] API Documentation (Swagger UI: `/api-docs`, spec: `/openapi.json`, nguồn `src/docs/openapi.spec.js`)
+- [x] API smoke test tự động cho toàn bộ route chính (`npm run test:api-smoke`, pass 32/32)
+- [x] Sửa lỗi backend được phát hiện qua smoke test:
+  - [x] `review.controller.js`: map đúng `Patient._id` thay vì `User._id`
+  - [x] `rating.controller.js`: map đúng `Patient._id` cho user role `patient`
+  - [x] `fileUpload.controller.js`: đổi `file.remove()` sang `file.deleteOne()` để tránh lỗi 500
 
 ### ❌ Cần Hoàn Thành
 - [ ] Unit Tests
@@ -623,6 +628,13 @@ cp .env.example .env
 ```bash
 npm run dev      # Sử dụng nodemon (auto-reload)
 ```
+
+### API Smoke Test (tự động)
+```bash
+npm run test:api-smoke
+```
+
+Kết quả hiện tại: **32/32 bước PASS**.
 
 ### Production
 ```bash
@@ -663,7 +675,7 @@ Nếu có bất kỳ câu hỏi hoặc cần hỗ trợ:
 
 ---
 
-**Cập nhật lần cuối:** 28/03/2026
+**Cập nhật lần cuối:** 02/04/2026
 **Status:** Đang phát triển (Development)
 **Version:** 1.0.0
 

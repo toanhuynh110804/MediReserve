@@ -1,7 +1,11 @@
 const Review = require('../models/Review');
+const Patient = require('../models/Patient');
 
 exports.create = async (req, res) => {
-  const review = await Review.create({ ...req.body, patient: req.user._id });
+  const patient = await Patient.findOne({ user: req.user._id });
+  if (!patient) return res.status(400).json({ message: 'Không tìm thấy hồ sơ bệnh nhân' });
+
+  const review = await Review.create({ ...req.body, patient: patient._id });
   res.status(201).json(review);
 };
 
@@ -10,7 +14,11 @@ exports.getAll = async (req, res) => {
 
   if (req.query.doctor) query.doctor = req.query.doctor;
   if (req.query.hospital) query.hospital = req.query.hospital;
-  if (req.user.role === 'patient') query.patient = req.user._id;
+  if (req.user.role === 'patient') {
+    const patient = await Patient.findOne({ user: req.user._id });
+    if (!patient) return res.status(404).json({ message: 'Bệnh nhân không tồn tại' });
+    query.patient = patient._id;
+  }
 
   const reviews = await Review.find(query).populate('patient doctor hospital appointment');
   res.json(reviews);

@@ -1,8 +1,13 @@
 const Rating = require('../models/Rating');
+const Patient = require('../models/Patient');
 
 exports.create = async (req, res) => {
   const data = { ...req.body };
-  if (req.user.role === 'patient') data.patient = data.patient || req.user._id;
+  if (req.user.role === 'patient') {
+    const patient = await Patient.findOne({ user: req.user._id });
+    if (!patient) return res.status(400).json({ message: 'Không tìm thấy hồ sơ bệnh nhân' });
+    data.patient = data.patient || patient._id;
+  }
   const rating = await Rating.create(data);
   res.status(201).json(rating);
 };
