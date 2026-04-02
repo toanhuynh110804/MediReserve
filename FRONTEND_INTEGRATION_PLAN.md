@@ -640,9 +640,32 @@ Muc tieu phan nay: Trien khai frontend theo cach chia nho, xong tung chuc nang r
   - npm run test: PASS (108/108 tests)
   - npm run build: PASS
 
-### Chuc nang #11, #13 tro di
+### Chuc nang #11 - Staff/users/roles management
+- Trang thai: DONE
+- Pham vi hoan tat:
+  - Mo rong `AdminPage` bang panel quan ly `users`, `staff`, `roles` tach biet voi catalog workspace.
+  - Danh sach users su dung `GET /api/users`, co filter theo role de admin ra quyet dinh nhanh.
+  - CRUD ho so nhan su su dung `GET/POST/PUT/DELETE /api/staff`.
+  - CRUD role su dung `GET/POST/PUT/DELETE /api/roles`.
+  - Form nhan su lien ket voi user, hospital, department; co role noi bo va status.
+  - Form role cho phep nhap permissions theo tung dong hoac dau phay, frontend chuan hoa thanh array.
+  - Giu staff page rieng cho catalog-only; user management chi xuat hien o admin area de dung phan quyen backend.
+- File chinh da tao/cap nhat:
+  - frontend/src/shared/api/userManagementApi.js
+  - frontend/src/shared/api/userManagementApi.test.js
+  - frontend/src/features/admin/userManagementHelpers.js
+  - frontend/src/features/admin/userManagementHelpers.test.js
+  - frontend/src/features/admin/UserManagementPanel.jsx
+  - frontend/src/features/admin/UserManagementPanel.test.jsx
+  - frontend/src/pages/AdminPage.jsx
+- Ket qua test:
+  - npm run lint: PASS
+  - npm run test: PASS (119/119 tests)
+  - npm run build: PASS
+
+### Chuc nang #13 tro di
 - Trang thai: CHUA BAT DAU
 
 ---
 Cap nhat: 2026-04-03
-Trang thai: Frontend da hoan thanh den chuc nang #10 (admin/staff catalog modules)
+Trang thai: Frontend da hoan thanh den chuc nang #11 (staff/users/roles management)
