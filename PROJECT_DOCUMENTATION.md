@@ -598,13 +598,14 @@ NODE_ENV=development
 - [x] Realtime socket bằng `socket.io` (emit sự kiện `appointment:created`, `appointment:cancelled`)
 - [x] Frontend chức năng #1 (foundation): router, auth guard, role guard, app shell, axios client
 - [x] Frontend chức năng #2: Authentication flow thật (login/register/profile với backend)
+- [x] Frontend chức năng #3: Authorization UI (menu theo role + route theo role)
 - [x] Sửa lỗi backend được phát hiện qua smoke test:
   - [x] `review.controller.js`: map đúng `Patient._id` thay vì `User._id`
   - [x] `rating.controller.js`: map đúng `Patient._id` cho user role `patient`
   - [x] `fileUpload.controller.js`: đổi `file.remove()` sang `file.deleteOne()` để tránh lỗi 500
 
 ### ❌ Cần Hoàn Thành
-- [ ] Frontend chức năng #3+: triển khai tuần tự các module theo `FRONTEND_INTEGRATION_PLAN.md`
+- [ ] Frontend chức năng #4+: triển khai tuần tự các module theo `FRONTEND_INTEGRATION_PLAN.md`
 - [ ] Unit Tests
 - [ ] Integration Tests
 - [ ] Hoàn thiện Joi cho các route còn lại (đã có middleware + auth + appointments)
@@ -655,6 +656,11 @@ Frontend function #1 validation (workspace frontend/):
 Frontend function #2 validation (workspace frontend/):
 - `npm run lint`: PASS
 - `npm run test`: PASS (2/2)
+- `npm run build`: PASS
+
+Frontend function #3 validation (workspace frontend/):
+- `npm run lint`: PASS
+- `npm run test`: PASS (7/7)
 - `npm run build`: PASS
 
 ### Production

@@ -2,11 +2,15 @@ import { Navigate, Route, Routes } from 'react-router-dom'
 import { AppShell } from '../layouts/AppShell'
 import { RequireAuth } from '../features/auth/RequireAuth'
 import { RequireRole } from '../features/auth/RequireRole'
+import { RoleHomeRedirect } from '../features/auth/RoleHomeRedirect'
 import { HomePage } from '../pages/HomePage'
 import { LoginPage } from '../pages/LoginPage'
 import { RegisterPage } from '../pages/RegisterPage'
 import { DashboardPage } from '../pages/DashboardPage'
 import { AdminPage } from '../pages/AdminPage'
+import { PatientPage } from '../pages/PatientPage'
+import { DoctorPage } from '../pages/DoctorPage'
+import { StaffPage } from '../pages/StaffPage'
 import { UnauthorizedPage } from '../pages/UnauthorizedPage'
 import { NotFoundPage } from '../pages/NotFoundPage'
 
@@ -20,10 +24,24 @@ export function AppRouter() {
         <Route path="/unauthorized" element={<UnauthorizedPage />} />
 
         <Route element={<RequireAuth />}>
-          <Route path="/app" element={<DashboardPage />} />
+          <Route path="/app" element={<RoleHomeRedirect />} />
+          <Route path="/tong-quan" element={<DashboardPage />} />
+
+          <Route element={<RequireRole roles={['patient']} />}>
+            <Route path="/benh-nhan" element={<PatientPage />} />
+          </Route>
+
+          <Route element={<RequireRole roles={['doctor']} />}>
+            <Route path="/bac-si" element={<DoctorPage />} />
+          </Route>
+
+          <Route element={<RequireRole roles={['staff']} />}>
+            <Route path="/nhan-vien" element={<StaffPage />} />
+          </Route>
 
           <Route element={<RequireRole roles={['admin']} />}>
-            <Route path="/admin" element={<AdminPage />} />
+            <Route path="/quan-tri" element={<AdminPage />} />
+            <Route path="/admin" element={<Navigate to="/quan-tri" replace />} />
           </Route>
         </Route>
 

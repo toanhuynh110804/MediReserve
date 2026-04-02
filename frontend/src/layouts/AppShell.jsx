@@ -1,27 +1,22 @@
 import { NavLink, Outlet } from 'react-router-dom'
 import { useAuth } from '../features/auth/useAuth'
+import { buildNavItems } from './navItems'
+import { ROLE_LABELS } from '../shared/constants/roles'
 
 export function AppShell() {
   const { isAuthenticated, user, logout } = useAuth()
-  const roleLabelMap = {
-    patient: 'Bệnh nhân',
-    doctor: 'Bác sĩ',
-    staff: 'Nhân viên',
-    admin: 'Quản trị viên',
-  }
+  const navItems = buildNavItems(isAuthenticated, user?.role)
 
   return (
     <div className="app-shell">
       <header className="topbar">
         <strong className="brand">MediReserve - Nền tảng giao diện</strong>
         <nav className="nav" aria-label="Điều hướng chính">
-          <NavLink to="/" end>
-            Trang chu
-          </NavLink>
-          <NavLink to="/app">Tổng quan</NavLink>
-          <NavLink to="/admin">Quản trị</NavLink>
-          {!isAuthenticated ? <NavLink to="/login">Đăng nhập</NavLink> : null}
-          {!isAuthenticated ? <NavLink to="/register">Đăng ký</NavLink> : null}
+          {navItems.map((item) => (
+            <NavLink key={item.to + item.label} to={item.to} end={item.to === '/'}>
+              {item.label}
+            </NavLink>
+          ))}
         </nav>
       </header>
 
@@ -32,7 +27,7 @@ export function AppShell() {
       {isAuthenticated ? (
         <div className="panel">
           <p>
-            Phiên đăng nhập: <strong>{user?.name || 'Người dùng chưa xác định'}</strong> ({roleLabelMap[user?.role] || 'Vai trò chưa xác định'})
+            Phiên đăng nhập: <strong>{user?.name || 'Người dùng chưa xác định'}</strong> ({ROLE_LABELS[user?.role] || 'Vai trò chưa xác định'})
           </p>
           <div className="actions">
             <button className="warn" onClick={logout} type="button">

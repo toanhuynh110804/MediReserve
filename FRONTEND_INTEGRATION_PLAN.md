@@ -385,7 +385,31 @@ Muc tieu phan nay: Trien khai frontend theo cach chia nho, xong tung chuc nang r
   - Auth flow da su dung du lieu backend that, khong con token demo.
   - Role value van giu `patient|doctor|staff|admin` de tuong thich backend.
 
-### Chuc nang #3 tro di
+### Chuc nang #3 - Authorization UI
+- Trang thai: DONE
+- Pham vi hoan tat:
+  - Menu dieu huong hien thi theo role dang nhap.
+  - Route theo role rieng: `/benh-nhan`, `/bac-si`, `/nhan-vien`, `/quan-tri`.
+  - Route `/app` duoc doi thanh diem vao role-based (tu dong redirect den khu vuc role).
+  - Giu route cu `/admin` theo huong redirect sang `/quan-tri` de tuong thich nguoc.
+  - Role guard da duoc test cho truong hop dung role/sai role.
+- File chinh da tao/cap nhat:
+  - frontend/src/app/AppRouter.jsx
+  - frontend/src/layouts/AppShell.jsx
+  - frontend/src/layouts/navItems.js
+  - frontend/src/shared/constants/roles.js
+  - frontend/src/features/auth/RoleHomeRedirect.jsx
+  - frontend/src/features/auth/RequireRole.test.jsx
+  - frontend/src/layouts/navItems.test.js
+  - frontend/src/pages/PatientPage.jsx
+  - frontend/src/pages/DoctorPage.jsx
+  - frontend/src/pages/StaffPage.jsx
+- Ket qua test:
+  - npm run lint: PASS
+  - npm run test: PASS (7/7 tests)
+  - npm run build: PASS
+
+### Chuc nang #4 tro di
 - Trang thai: CHUA BAT DAU
 
 ---

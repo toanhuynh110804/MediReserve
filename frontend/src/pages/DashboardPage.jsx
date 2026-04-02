@@ -12,8 +12,8 @@ export function DashboardPage() {
 
   return (
     <section>
-      <h1>Tổng quan (Cần đăng nhập)</h1>
-      <p>Trang này yêu cầu đăng nhập và được dùng để xác nhận auth guard hoạt động.</p>
+      <h1>Tổng quan hệ thống</h1>
+      <p>Trang này dùng để kiểm tra kết nối API. Điều hướng chính theo vai trò nằm ở menu phía trên.</p>
       <div className="actions">
         <button type="button" onClick={handleHealthCheck}>
           Kiểm tra kết nối API
