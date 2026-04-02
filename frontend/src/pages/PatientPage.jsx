@@ -10,6 +10,7 @@ import {
   fetchPatientBookingSnapshot,
   resolveSelectedScheduleId,
 } from '../features/patient/transactionSync'
+import { subscribeAppointmentEvents } from '../shared/realtime/socketService'
 
 function formatDate(value) {
   if (!value) return 'Không xác định'
@@ -133,6 +134,15 @@ export function PatientPage() {
 
   useEffect(() => {
     syncFromServer({ clearFeedback: true, reason: 'filter-change' })
+  }, [syncFromServer])
+
+  useEffect(() => {
+    const unsubscribe = subscribeAppointmentEvents(() => {
+      setMessage('Phát hiện thay đổi thời gian thực. Đang đồng bộ dữ liệu...')
+      void syncFromServer({ clearFeedback: false, reason: 'realtime-event' })
+    })
+
+    return unsubscribe
   }, [syncFromServer])
 
   const isBusy = syncing || mutating

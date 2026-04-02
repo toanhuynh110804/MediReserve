@@ -445,9 +445,29 @@ Muc tieu phan nay: Trien khai frontend theo cach chia nho, xong tung chuc nang r
   - npm run test: PASS (13/13 tests)
   - npm run build: PASS
 
-### Chuc nang #6 tro di
+### Chuc nang #6 - Realtime socket
+- Trang thai: DONE
+- Pham vi hoan tat:
+  - Ket noi socket theo phien dang nhap trong AuthProvider (connect/disconnect theo session).
+  - Join room nguoi dung `join-user-room` theo `userId` va tu join lai khi reconnect.
+  - Lang nghe su kien `appointment:created` va `appointment:cancelled` o trang benh nhan.
+  - Su kien realtime chi dung de trigger `syncFromServer`, khong patch state thu cong.
+  - Tich hop env `VITE_SOCKET_URL` (neu khong set thi fallback ve `VITE_API_BASE_URL`).
+- File chinh da tao/cap nhat:
+  - frontend/src/features/auth/AuthProvider.jsx
+  - frontend/src/pages/PatientPage.jsx
+  - frontend/src/shared/realtime/socketService.js
+  - frontend/src/shared/constants/env.js
+  - frontend/src/shared/constants/env.test.js
+  - frontend/.env.example
+- Ket qua test:
+  - npm run lint: PASS
+  - npm run test: PASS (15/15 tests)
+  - npm run build: PASS
+
+### Chuc nang #7 tro di
 - Trang thai: CHUA BAT DAU
 
 ---
 Cap nhat: 2026-04-02
-Trang thai: Planning updated theo backend moi (upload multipart + transaction + socket)
+Trang thai: Frontend da hoan thanh den chuc nang #6 (realtime socket)

@@ -2,6 +2,7 @@ import { useCallback, useEffect, useMemo, useState } from 'react'
 import { authStorage } from '../../shared/utils/authStorage'
 import { AuthContext } from './auth-context'
 import { loginApi, profileApi, registerApi } from '../../shared/api/authApi'
+import { connectSocket, disconnectSocket } from '../../shared/realtime/socketService'
 
 export function AuthProvider({ children }) {
   const [token, setToken] = useState(() => authStorage.getToken())
@@ -28,6 +29,7 @@ export function AuthProvider({ children }) {
   }, [persistSession])
 
   const logout = useCallback(() => {
+    disconnectSocket()
     authStorage.clearToken()
     authStorage.clearUser()
     setToken(null)
@@ -59,6 +61,29 @@ export function AuthProvider({ children }) {
 
     bootstrapAuth()
   }, [token, user, logout])
+
+  useEffect(() => {
+    if (!token || !user) {
+      disconnectSocket()
+      return undefined
+    }
+
+    const userId = user._id || user.id
+    const socket = connectSocket(userId)
+
+    const joinRoomOnReconnect = () => {
+      if (userId) {
+        socket.emit('join-user-room', { userId })
+      }
+    }
+
+    socket.on('connect', joinRoomOnReconnect)
+
+    return () => {
+      socket.off('connect', joinRoomOnReconnect)
+      disconnectSocket()
+    }
+  }, [token, user])
 
   const value = useMemo(
     () => ({
