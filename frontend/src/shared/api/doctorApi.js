@@ -1,5 +1,10 @@
 import { httpClient } from './httpClient'
 
+export async function getMyDoctorProfileApi() {
+  const response = await httpClient.get('/api/doctors/me')
+  return response.data
+}
+
 export async function getDoctorSchedulesApi(doctorId, filters = {}) {
   const params = new URLSearchParams()
   params.append('doctor', doctorId)

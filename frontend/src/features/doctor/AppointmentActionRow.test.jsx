@@ -1,5 +1,5 @@
 import { describe, expect, it, vi } from 'vitest'
-import { render, screen } from '@testing-library/react'
+import { fireEvent, render, screen } from '@testing-library/react'
 import { AppointmentActionRow } from './AppointmentActionRow'
 
 describe('AppointmentActionRow', () => {
@@ -11,12 +11,17 @@ describe('AppointmentActionRow', () => {
   }
 
   const mockOnStatusChange = vi.fn()
+  const mockOnOpenClinicalWorkspace = vi.fn()
 
   it('renders appointment details in row', () => {
     render(
       <table>
         <tbody>
-          <AppointmentActionRow appointment={mockAppointment} onStatusChange={mockOnStatusChange} />
+          <AppointmentActionRow
+            appointment={mockAppointment}
+            onStatusChange={mockOnStatusChange}
+            onOpenClinicalWorkspace={mockOnOpenClinicalWorkspace}
+          />
         </tbody>
       </table>,
     )
@@ -28,12 +33,17 @@ describe('AppointmentActionRow', () => {
     render(
       <table>
         <tbody>
-          <AppointmentActionRow appointment={mockAppointment} onStatusChange={mockOnStatusChange} />
+          <AppointmentActionRow
+            appointment={mockAppointment}
+            onStatusChange={mockOnStatusChange}
+            onOpenClinicalWorkspace={mockOnOpenClinicalWorkspace}
+          />
         </tbody>
       </table>,
     )
 
     const buttons = screen.getAllByRole('button')
+    expect(buttons.map((b) => b.textContent)).toContain('Hồ sơ khám')
     expect(buttons.map((b) => b.textContent)).toContain('Xác nhận')
     expect(buttons.map((b) => b.textContent)).toContain('Hủy')
   })
@@ -42,7 +52,12 @@ describe('AppointmentActionRow', () => {
     render(
       <table>
         <tbody>
-          <AppointmentActionRow appointment={mockAppointment} onStatusChange={mockOnStatusChange} disabled={true} />
+          <AppointmentActionRow
+            appointment={mockAppointment}
+            onStatusChange={mockOnStatusChange}
+            onOpenClinicalWorkspace={mockOnOpenClinicalWorkspace}
+            disabled={true}
+          />
         </tbody>
       </table>,
     )
@@ -57,12 +72,34 @@ describe('AppointmentActionRow', () => {
     render(
       <table>
         <tbody>
-          <AppointmentActionRow appointment={mockAppointment} onStatusChange={mockOnStatusChange} />
+          <AppointmentActionRow
+            appointment={mockAppointment}
+            onStatusChange={mockOnStatusChange}
+            onOpenClinicalWorkspace={mockOnOpenClinicalWorkspace}
+          />
         </tbody>
       </table>,
     )
 
     const status = screen.getByText('Chờ phê duyệt')
     expect(status).toHaveStyle({ color: '#fbc02d' })
+  })
+
+  it('opens clinical workspace when button is clicked', () => {
+    render(
+      <table>
+        <tbody>
+          <AppointmentActionRow
+            appointment={mockAppointment}
+            onStatusChange={mockOnStatusChange}
+            onOpenClinicalWorkspace={mockOnOpenClinicalWorkspace}
+          />
+        </tbody>
+      </table>,
+    )
+
+    fireEvent.click(screen.getByRole('button', { name: 'Hồ sơ khám' }))
+
+    expect(mockOnOpenClinicalWorkspace).toHaveBeenCalledWith(mockAppointment)
   })
 })

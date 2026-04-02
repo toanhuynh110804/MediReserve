@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { renderAppointmentStatus, canTransitionStatus } from './appointmentHelpers'
+import { canTransitionStatus, getAppointmentPatientLabel, renderAppointmentStatus } from './appointmentHelpers'
 
 describe('appointmentHelpers', () => {
   it('renderAppointmentStatus returns correct label and color', () => {
@@ -24,5 +24,9 @@ describe('appointmentHelpers', () => {
     expect(canTransitionStatus('pending', 'completed')).toBe(false)
     expect(canTransitionStatus('completed', 'confirmed')).toBe(false)
     expect(canTransitionStatus('cancelled', 'pending')).toBe(false)
+  })
+
+  it('getAppointmentPatientLabel falls back to patient code when name is missing', () => {
+    expect(getAppointmentPatientLabel({ patient: { _id: 'patient-123456' } })).toBe('BN 123456')
   })
 })

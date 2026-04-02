@@ -1,7 +1,13 @@
 import { useState } from 'react'
-import { renderAppointmentStatus, canTransitionStatus } from './appointmentHelpers'
+import { canTransitionStatus, getAppointmentPatientLabel, renderAppointmentStatus } from './appointmentHelpers'
 
-export function AppointmentActionRow({ appointment, onStatusChange, disabled = false }) {
+export function AppointmentActionRow({
+  appointment,
+  onStatusChange,
+  onOpenClinicalWorkspace,
+  disabled = false,
+  isSelected = false,
+}) {
   const [updatingStatus, setUpdatingStatus] = useState(null)
 
   const status = renderAppointmentStatus(appointment.status)
@@ -43,9 +49,9 @@ export function AppointmentActionRow({ appointment, onStatusChange, disabled = f
   }
 
   return (
-    <tr>
+    <tr style={isSelected ? { backgroundColor: '#f5f9ff' } : undefined}>
       <td>{appointment._id?.slice(-8)}</td>
-      <td>{appointment.patient?.user?.name || 'N/A'}</td>
+      <td>{getAppointmentPatientLabel(appointment)}</td>
       <td>{formatDate(appointment.date)}</td>
       <td>
         <span style={{ color: status.color, fontWeight: 'bold' }}>
@@ -54,6 +60,14 @@ export function AppointmentActionRow({ appointment, onStatusChange, disabled = f
       </td>
       <td>
         <div className="actions" style={{ flexDirection: 'column', gap: '0.5rem' }}>
+          <button
+            type="button"
+            onClick={() => onOpenClinicalWorkspace?.(appointment)}
+            disabled={disabled}
+            style={{ fontSize: '0.85rem', padding: '0.4rem 0.8rem' }}
+          >
+            Hồ sơ khám
+          </button>
           {getAvailableTransitions().map((trans) => (
             <button
               key={trans.status}

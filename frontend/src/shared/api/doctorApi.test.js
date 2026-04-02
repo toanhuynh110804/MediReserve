@@ -3,6 +3,7 @@ import {
   getDoctorSchedulesApi,
   getDoctorAppointmentsApi,
   getAppointmentByIdApi,
+  getMyDoctorProfileApi,
   updateAppointmentStatusApi,
   cancelAppointmentApi,
 } from './doctorApi'
@@ -11,6 +12,16 @@ import { httpClient } from './httpClient'
 vi.mock('./httpClient')
 
 describe('doctorApi', () => {
+  it('getMyDoctorProfileApi fetches doctor profile', async () => {
+    const mockData = { _id: 'doctor-1' }
+    httpClient.get.mockResolvedValue({ data: mockData })
+
+    const result = await getMyDoctorProfileApi()
+
+    expect(httpClient.get).toHaveBeenCalledWith('/api/doctors/me')
+    expect(result).toEqual(mockData)
+  })
+
   it('getDoctorSchedulesApi fetches doctor schedules', async () => {
     const mockData = [{ _id: '1', doctor: 'doc1', date: '2026-04-02', slot: 'morning' }]
     httpClient.get.mockResolvedValue({ data: mockData })

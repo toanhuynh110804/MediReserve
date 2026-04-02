@@ -575,9 +575,46 @@ Muc tieu phan nay: Trien khai frontend theo cach chia nho, xong tung chuc nang r
   - npm run test: PASS (66/66 tests)
   - npm run build: PASS
 
-### Chuc nang #9, #10, #11, #13 tro di
+### Chuc nang #9 - Medical records + prescriptions
+- Trang thai: DONE
+- Pham vi hoan tat:
+  - Workspace ho so kham duoc mo truc tiep tu bang lich hen cua bac si.
+  - Nap doctor profile that qua `GET /api/doctors/me` de dung doctorId profile thay vi userId.
+  - Tai danh sach ho so y te cua bac si qua `GET /api/medical-records?doctor=...`.
+  - Tai danh sach don thuoc cua bac si qua `GET /api/prescriptions?doctor=...`.
+  - Tai danh muc thuoc qua `GET /api/medicines` de ke don trong form.
+  - Tao/cap nhat ho so y te cho appointment confirmed/completed.
+  - Tao/cap nhat don thuoc gan voi medical record dang chon.
+  - Chuan hoa payload: trieu chung text area -> array, dong thuoc -> items[] co quantity so.
+  - Co placeholder ro rang khi chua chon appointment hoac chua tao medical record.
+- File chinh da tao/cap nhat:
+  - frontend/src/shared/api/doctorApi.js
+  - frontend/src/shared/api/doctorApi.test.js
+  - frontend/src/shared/api/medicalRecordApi.js
+  - frontend/src/shared/api/medicalRecordApi.test.js
+  - frontend/src/shared/api/prescriptionApi.js
+  - frontend/src/shared/api/prescriptionApi.test.js
+  - frontend/src/shared/api/medicineApi.js
+  - frontend/src/shared/api/medicineApi.test.js
+  - frontend/src/features/doctor/appointmentHelpers.js
+  - frontend/src/features/doctor/appointmentHelpers.test.js
+  - frontend/src/features/doctor/medicalRecordHelpers.js
+  - frontend/src/features/doctor/medicalRecordHelpers.test.js
+  - frontend/src/features/doctor/MedicalRecordForm.jsx
+  - frontend/src/features/doctor/MedicalRecordForm.test.jsx
+  - frontend/src/features/doctor/PrescriptionForm.jsx
+  - frontend/src/features/doctor/PrescriptionForm.test.jsx
+  - frontend/src/features/doctor/AppointmentActionRow.jsx
+  - frontend/src/features/doctor/AppointmentActionRow.test.jsx
+  - frontend/src/pages/DoctorPage.jsx
+- Ket qua test:
+  - npm run lint: PASS
+  - npm run test: PASS (92/92 tests)
+  - npm run build: PASS
+
+### Chuc nang #10, #11, #13 tro di
 - Trang thai: CHUA BAT DAU
 
 ---
 Cap nhat: 2026-04-03
-Trang thai: Frontend da hoan thanh den chuc nang #8 (doctor workspace)
+Trang thai: Frontend da hoan thanh den chuc nang #9 (medical records + prescriptions)
