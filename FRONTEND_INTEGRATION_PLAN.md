@@ -409,7 +409,26 @@ Muc tieu phan nay: Trien khai frontend theo cach chia nho, xong tung chuc nang r
   - npm run test: PASS (7/7 tests)
   - npm run build: PASS
 
-### Chuc nang #4 tro di
+### Chuc nang #4 - Patient appointment co ban
+- Trang thai: DONE
+- Pham vi hoan tat (du lieu that):
+  - Tai lich kham that tu API `GET /api/schedules`.
+  - Tai danh sach bac si that tu API `GET /api/doctors` de hien thi ten bac si.
+  - Dat lich that qua API `POST /api/appointments`.
+  - Tai lich hen cua benh nhan that qua API `GET /api/appointments`.
+  - Huy lich that qua API `POST /api/appointments/:id/cancel`.
+  - Khong su dung du lieu ao trong luong patient appointment.
+- File chinh da tao/cap nhat:
+  - frontend/src/pages/PatientPage.jsx
+  - frontend/src/shared/api/patientAppointmentsApi.js
+  - frontend/src/features/patient/appointmentPayload.js
+  - frontend/src/features/patient/appointmentPayload.test.js
+- Ket qua test:
+  - npm run lint: PASS
+  - npm run test: PASS (9/9 tests)
+  - npm run build: PASS
+
+### Chuc nang #5 tro di
 - Trang thai: CHUA BAT DAU
 
 ---
