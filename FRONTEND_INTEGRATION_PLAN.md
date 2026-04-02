@@ -428,7 +428,24 @@ Muc tieu phan nay: Trien khai frontend theo cach chia nho, xong tung chuc nang r
   - npm run test: PASS (9/9 tests)
   - npm run build: PASS
 
-### Chuc nang #5 tro di
+### Chuc nang #5 - Dong bo transaction tren UI
+- Trang thai: DONE
+- Pham vi hoan tat:
+  - Sau dat/huy lich, UI khong cap nhat ao; luon dong bo lai tu backend theo pipeline chung.
+  - Gom 3 nguon du lieu trong 1 snapshot dong bo: schedules + doctors + appointments.
+  - Co co che chan ket qua cu (stale response guard) de tranh ghi de state sai thu tu response.
+  - Co trang thai `dang dong bo` va `dang mutation`, khoa thao tac de tranh goi trung.
+  - Hien thi moc thoi gian dong bo gan nhat de de doi chieu du lieu.
+- File chinh da tao/cap nhat:
+  - frontend/src/pages/PatientPage.jsx
+  - frontend/src/features/patient/transactionSync.js
+  - frontend/src/features/patient/transactionSync.test.js
+- Ket qua test:
+  - npm run lint: PASS
+  - npm run test: PASS (13/13 tests)
+  - npm run build: PASS
+
+### Chuc nang #6 tro di
 - Trang thai: CHUA BAT DAU
 
 ---

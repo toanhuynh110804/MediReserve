@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo, useState } from 'react'
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import {
   cancelAppointmentApi,
   createAppointmentFromScheduleApi,
@@ -6,6 +6,10 @@ import {
   getMyAppointmentsApi,
   getSchedulesApi,
 } from '../shared/api/patientAppointmentsApi'
+import {
+  fetchPatientBookingSnapshot,
+  resolveSelectedScheduleId,
+} from '../features/patient/transactionSync'
 
 function formatDate(value) {
   if (!value) return 'Không xác định'
@@ -34,53 +38,55 @@ export function PatientPage() {
   const [schedules, setSchedules] = useState([])
   const [appointments, setAppointments] = useState([])
   const [doctors, setDoctors] = useState([])
-  const [loadingSchedules, setLoadingSchedules] = useState(false)
-  const [loadingAppointments, setLoadingAppointments] = useState(false)
+  const [syncing, setSyncing] = useState(false)
+  const [mutating, setMutating] = useState(false)
   const [bookingScheduleId, setBookingScheduleId] = useState('')
   const [bookingNotes, setBookingNotes] = useState('')
   const [cancelReasonById, setCancelReasonById] = useState({})
   const [error, setError] = useState('')
   const [message, setMessage] = useState('')
+  const [lastSyncedAt, setLastSyncedAt] = useState(null)
+  const latestSyncRequestIdRef = useRef(0)
 
   const doctorNameMap = useMemo(() => buildDoctorNameMap(doctors), [doctors])
 
-  const loadSchedulesAndDoctors = useCallback(async () => {
-    setLoadingSchedules(true)
+  const syncFromServer = useCallback(async ({ clearFeedback = true, reason = 'manual' } = {}) => {
+    latestSyncRequestIdRef.current += 1
+    const currentRequestId = latestSyncRequestIdRef.current
+
+    setSyncing(true)
     setError('')
-    setMessage('')
+    if (clearFeedback) setMessage('')
+
     try {
-      const [scheduleData, doctorData] = await Promise.all([
-        getSchedulesApi(dateFilter ? { date: dateFilter } : {}),
-        getDoctorsApi(),
-      ])
-      setDoctors(doctorData || [])
-      const openSchedules = (scheduleData || []).filter((item) => item.status === 'open')
-      setSchedules(openSchedules)
-      setBookingScheduleId((previous) => {
-        if (previous && openSchedules.some((item) => item._id === previous)) {
-          return previous
-        }
-        return openSchedules[0]?._id || ''
+      const snapshot = await fetchPatientBookingSnapshot({
+        dateFilter,
+        getSchedules: getSchedulesApi,
+        getDoctors: getDoctorsApi,
+        getAppointments: getMyAppointmentsApi,
       })
+
+      if (currentRequestId !== latestSyncRequestIdRef.current) {
+        return
+      }
+
+      setDoctors(snapshot.doctors)
+      setSchedules(snapshot.openSchedules)
+      setAppointments(snapshot.appointments)
+      setBookingScheduleId((previous) => resolveSelectedScheduleId(snapshot.openSchedules, previous))
+      setLastSyncedAt(snapshot.fetchedAt)
+
+      if (reason === 'post-mutation') {
+        setMessage('Đã đồng bộ lại dữ liệu mới nhất từ máy chủ.')
+      }
     } catch (requestError) {
-      setError(requestError.response?.data?.message || 'Không tải được danh sách lịch khám.')
+      setError(requestError.response?.data?.message || 'Không thể đồng bộ dữ liệu từ máy chủ.')
     } finally {
-      setLoadingSchedules(false)
+      if (currentRequestId === latestSyncRequestIdRef.current) {
+        setSyncing(false)
+      }
     }
   }, [dateFilter])
-
-  const loadAppointments = useCallback(async () => {
-    setLoadingAppointments(true)
-    setError('')
-    try {
-      const data = await getMyAppointmentsApi()
-      setAppointments(data || [])
-    } catch (requestError) {
-      setError(requestError.response?.data?.message || 'Không tải được danh sách lịch hẹn.')
-    } finally {
-      setLoadingAppointments(false)
-    }
-  }, [])
 
   const handleBook = async () => {
     if (!bookingScheduleId) {
@@ -94,35 +100,42 @@ export function PatientPage() {
       return
     }
 
+    setMutating(true)
     setError('')
     setMessage('')
     try {
       await createAppointmentFromScheduleApi(selectedSchedule, bookingNotes)
-      setMessage('Đặt lịch thành công.')
+      setMessage('Đặt lịch thành công. Đang đồng bộ dữ liệu...')
       setBookingNotes('')
-      await Promise.all([loadSchedulesAndDoctors(), loadAppointments()])
+      await syncFromServer({ clearFeedback: false, reason: 'post-mutation' })
     } catch (requestError) {
       setError(requestError.response?.data?.message || 'Đặt lịch thất bại.')
+    } finally {
+      setMutating(false)
     }
   }
 
   const handleCancel = async (appointmentId) => {
+    setMutating(true)
     setError('')
     setMessage('')
     try {
       await cancelAppointmentApi(appointmentId, cancelReasonById[appointmentId] || '')
-      setMessage('Hủy lịch thành công.')
+      setMessage('Hủy lịch thành công. Đang đồng bộ dữ liệu...')
       setCancelReasonById((prev) => ({ ...prev, [appointmentId]: '' }))
-      await Promise.all([loadSchedulesAndDoctors(), loadAppointments()])
+      await syncFromServer({ clearFeedback: false, reason: 'post-mutation' })
     } catch (requestError) {
       setError(requestError.response?.data?.message || 'Hủy lịch thất bại.')
+    } finally {
+      setMutating(false)
     }
   }
 
   useEffect(() => {
-    loadSchedulesAndDoctors()
-    loadAppointments()
-  }, [loadSchedulesAndDoctors, loadAppointments])
+    syncFromServer({ clearFeedback: true, reason: 'filter-change' })
+  }, [syncFromServer])
+
+  const isBusy = syncing || mutating
 
   return (
     <section>
@@ -137,14 +150,13 @@ export function PatientPage() {
             type="date"
             value={dateFilter}
             onChange={(event) => setDateFilter(event.target.value)}
+            disabled={isBusy}
           />
-          <button type="button" onClick={loadSchedulesAndDoctors}>
-            {loadingSchedules ? 'Đang tải lịch...' : 'Tải lịch khám'}
-          </button>
-          <button className="secondary" type="button" onClick={loadAppointments}>
-            {loadingAppointments ? 'Đang tải lịch hẹn...' : 'Tải lịch hẹn của tôi'}
+          <button type="button" onClick={() => syncFromServer({ clearFeedback: true, reason: 'manual' })} disabled={isBusy}>
+            {syncing ? 'Đang đồng bộ...' : 'Đồng bộ dữ liệu'}
           </button>
         </div>
+        {lastSyncedAt ? <p className="muted">Lần đồng bộ gần nhất: {new Date(lastSyncedAt).toLocaleTimeString('vi-VN')}</p> : null}
       </div>
 
       {error ? <p className="form-error">{error}</p> : null}
@@ -181,7 +193,7 @@ export function PatientPage() {
         />
 
         <div className="actions">
-          <button type="button" onClick={handleBook} disabled={!bookingScheduleId || schedules.length === 0}>
+          <button type="button" onClick={handleBook} disabled={!bookingScheduleId || schedules.length === 0 || isBusy}>
             Đặt lịch ngay
           </button>
         </div>
@@ -218,6 +230,7 @@ export function PatientPage() {
                   <input
                     id={`cancel-${appointment._id}`}
                     value={cancelReasonById[appointment._id] || ''}
+                    disabled={isBusy}
                     onChange={(event) =>
                       setCancelReasonById((prev) => ({
                         ...prev,
@@ -227,7 +240,7 @@ export function PatientPage() {
                     placeholder="Nhập lý do hủy (không bắt buộc)"
                   />
                   <div className="actions">
-                    <button className="warn" type="button" onClick={() => handleCancel(appointment._id)}>
+                    <button className="warn" type="button" onClick={() => handleCancel(appointment._id)} disabled={isBusy}>
                       Hủy lịch hẹn
                     </button>
                   </div>
