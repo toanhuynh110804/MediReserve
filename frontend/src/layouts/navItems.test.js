@@ -7,13 +7,13 @@ describe('buildNavItems', () => {
     expect(items.map((item) => item.to)).toEqual(['/', '/login', '/register'])
   })
 
-  it('adds role home and admin link for admin users', () => {
+  it('adds role home, file manager and admin link for admin users', () => {
     const items = buildNavItems(true, 'admin')
-    expect(items.map((item) => item.to)).toEqual(['/', '/app', '/quan-tri'])
+    expect(items.map((item) => item.to)).toEqual(['/', '/app', '/quan-ly-tep', '/quan-tri'])
   })
 
-  it('adds role home only for patient users', () => {
+  it('adds role home and file manager for patient users', () => {
     const items = buildNavItems(true, 'patient')
-    expect(items.map((item) => item.to)).toEqual(['/', '/app', '/benh-nhan'])
+    expect(items.map((item) => item.to)).toEqual(['/', '/app', '/quan-ly-tep', '/benh-nhan'])
   })
 })

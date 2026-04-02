@@ -445,29 +445,35 @@ Muc tieu phan nay: Trien khai frontend theo cach chia nho, xong tung chuc nang r
   - npm run test: PASS (13/13 tests)
   - npm run build: PASS
 
-### Chuc nang #6 - Realtime socket
+### Chuc nang #7 - File upload multipart
 - Trang thai: DONE
 - Pham vi hoan tat:
-  - Ket noi socket theo phien dang nhap trong AuthProvider (connect/disconnect theo session).
-  - Join room nguoi dung `join-user-room` theo `userId` va tu join lai khi reconnect.
-  - Lang nghe su kien `appointment:created` va `appointment:cancelled` o trang benh nhan.
-  - Su kien realtime chi dung de trigger `syncFromServer`, khong patch state thu cong.
-  - Tich hop env `VITE_SOCKET_URL` (neu khong set thi fallback ve `VITE_API_BASE_URL`).
+  - Upload file qua form (chon file + nhan nut tai len).
+  - Hien thi danh sach file dua tren GET /api/files (sort theo thoi gian goi nhat).
+  - Xoa file (DELETE) voi xac nhan truoc.
+  - Hien thi metadata: ten, kich thuoc, loai, ngay tai.
+  - Download file tuc tiep (link sang /uploads/...).
+  - Route: /quan-ly-tep (accessible ko all authenticated roles).
+  - Menu: them link "Quan ly tep" cho tat ca user dang nhap.
 - File chinh da tao/cap nhat:
-  - frontend/src/features/auth/AuthProvider.jsx
-  - frontend/src/pages/PatientPage.jsx
-  - frontend/src/shared/realtime/socketService.js
-  - frontend/src/shared/constants/env.js
-  - frontend/src/shared/constants/env.test.js
-  - frontend/.env.example
+  - frontend/src/shared/api/fileApi.js
+  - frontend/src/shared/api/fileApi.test.js
+  - frontend/src/features/files/UploadForm.jsx
+  - frontend/src/features/files/UploadForm.test.jsx
+  - frontend/src/features/files/FileList.jsx
+  - frontend/src/features/files/FileList.test.jsx
+  - frontend/src/pages/FileManagerPage.jsx
+  - frontend/src/app/AppRouter.jsx (route /quan-ly-tep)
+  - frontend/src/layouts/navItems.js (them link)
+  - frontend/src/layouts/navItems.test.js (cap nhat test)
 - Ket qua test:
   - npm run lint: PASS
-  - npm run test: PASS (15/15 tests)
+  - npm run test: PASS (30/30 tests)
   - npm run build: PASS
 
-### Chuc nang #7 tro di
+### Chuc nang #12 tro di
 - Trang thai: CHUA BAT DAU
 
 ---
 Cap nhat: 2026-04-02
-Trang thai: Frontend da hoan thanh den chuc nang #6 (realtime socket)
+Trang thai: Frontend da hoan thanh den chuc nang #7 (file upload multipart)

@@ -13,7 +13,10 @@ export function buildNavItems(isAuthenticated, role) {
     ]
   }
 
-  const authItems = [{ to: '/app', label: 'Điểm vào hệ thống' }]
+  const authItems = [
+    { to: '/app', label: 'Điểm vào hệ thống' },
+    { to: '/quan-ly-tep', label: 'Quản lý tệp' },
+  ]
 
   if (role && ROLE_HOME_PATH[role]) {
     authItems.push({ to: ROLE_HOME_PATH[role], label: 'Khu vực của tôi' })

@@ -602,13 +602,14 @@ NODE_ENV=development
 - [x] Frontend chức năng #4: Patient appointment cơ bản (xem lịch, đặt lịch, hủy lịch bằng dữ liệu thật)
 - [x] Frontend chức năng #5: Đồng bộ transaction UI sau mutation (đồng bộ lại từ backend, chống lệch trạng thái)
 - [x] Frontend chức năng #6: Realtime socket cho patient appointment (event chỉ trigger đồng bộ lại từ backend)
+- [x] Frontend chức năng #7: File upload multipart (tải, xem danh sách, xóa file)
 - [x] Sửa lỗi backend được phát hiện qua smoke test:
   - [x] `review.controller.js`: map đúng `Patient._id` thay vì `User._id`
   - [x] `rating.controller.js`: map đúng `Patient._id` cho user role `patient`
   - [x] `fileUpload.controller.js`: đổi `file.remove()` sang `file.deleteOne()` để tránh lỗi 500
 
 ### ❌ Cần Hoàn Thành
-- [ ] Frontend chức năng #7+: triển khai tuần tự các module theo `FRONTEND_INTEGRATION_PLAN.md`
+- [ ] Frontend chức năng #8+: triển khai tuần tự các module theo `FRONTEND_INTEGRATION_PLAN.md`
 - [ ] Unit Tests
 - [ ] Integration Tests
 - [ ] Hoàn thiện Joi cho các route còn lại (đã có middleware + auth + appointments)
@@ -679,6 +680,11 @@ Frontend function #5 validation (workspace frontend/):
 Frontend function #6 validation (workspace frontend/):
 - `npm run lint`: PASS
 - `npm run test`: PASS (15/15)
+- `npm run build`: PASS
+
+Frontend function #7 validation (workspace frontend/):
+- `npm run lint`: PASS
+- `npm run test`: PASS (30/30)
 - `npm run build`: PASS
 
 ### Production
