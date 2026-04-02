@@ -603,6 +603,7 @@ NODE_ENV=development
 - [x] Frontend chức năng #5: Đồng bộ transaction UI sau mutation (đồng bộ lại từ backend, chống lệch trạng thái)
 - [x] Frontend chức năng #6: Realtime socket cho patient appointment (event chỉ trigger đồng bộ lại từ backend)
 - [x] Frontend chức năng #7: File upload multipart (tải, xem danh sách, xóa file)
+- [x] Frontend chức năng #12: Invoice/Payment views (xem hóa đơn + thanh toán lịch sử)
 - [x] Sửa lỗi backend được phát hiện qua smoke test:
   - [x] `review.controller.js`: map đúng `Patient._id` thay vì `User._id`
   - [x] `rating.controller.js`: map đúng `Patient._id` cho user role `patient`
@@ -685,6 +686,11 @@ Frontend function #6 validation (workspace frontend/):
 Frontend function #7 validation (workspace frontend/):
 - `npm run lint`: PASS
 - `npm run test`: PASS (30/30)
+- `npm run build`: PASS
+
+Frontend function #12 validation (workspace frontend/):
+- `npm run lint`: PASS
+- `npm run test`: PASS (49/49)
 - `npm run build`: PASS
 
 ### Production

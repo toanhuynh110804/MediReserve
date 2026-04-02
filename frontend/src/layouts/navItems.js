@@ -16,6 +16,7 @@ export function buildNavItems(isAuthenticated, role) {
   const authItems = [
     { to: '/app', label: 'Điểm vào hệ thống' },
     { to: '/quan-ly-tep', label: 'Quản lý tệp' },
+    { to: '/thanh-toan', label: 'Thanh toán' },
   ]
 
   if (role && ROLE_HOME_PATH[role]) {

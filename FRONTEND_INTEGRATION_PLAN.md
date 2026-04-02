@@ -445,35 +445,39 @@ Muc tieu phan nay: Trien khai frontend theo cach chia nho, xong tung chuc nang r
   - npm run test: PASS (13/13 tests)
   - npm run build: PASS
 
-### Chuc nang #7 - File upload multipart
+### Chuc nang #12 - Invoice/Payment views
 - Trang thai: DONE
 - Pham vi hoan tat:
-  - Upload file qua form (chon file + nhan nut tai len).
-  - Hien thi danh sach file dua tren GET /api/files (sort theo thoi gian goi nhat).
-  - Xoa file (DELETE) voi xac nhan truoc.
-  - Hien thi metadata: ten, kich thuoc, loai, ngay tai.
-  - Download file tuc tiep (link sang /uploads/...).
-  - Route: /quan-ly-tep (accessible ko all authenticated roles).
-  - Menu: them link "Quan ly tep" cho tat ca user dang nhap.
+  - Xem danh sach hoa don cua benh nhan (GET /api/invoices?patient=userId).
+  - Xem danh sach thanh toan cua benh nhan (GET /api/payments?patient=userId).
+  - Tab interface: chuyen giua "Hoa don" va "Thanh toan".
+  - Hien thi chi tiet: so tien, ngay tao, trang thai (mau sac theo trang thai).
+  - Format tien te VND, dinh dang ngay gio Vietnam.
+  - Route: /thanh-toan (accessible cho all authenticated roles).
+  - Menu: them link "Thanh toan" cho tat ca user dang nhap.
+  - Upload file: thanh toán là view-only (không edit, không tạo mới từ frontend).
 - File chinh da tao/cap nhat:
-  - frontend/src/shared/api/fileApi.js
-  - frontend/src/shared/api/fileApi.test.js
-  - frontend/src/features/files/UploadForm.jsx
-  - frontend/src/features/files/UploadForm.test.jsx
-  - frontend/src/features/files/FileList.jsx
-  - frontend/src/features/files/FileList.test.jsx
-  - frontend/src/pages/FileManagerPage.jsx
-  - frontend/src/app/AppRouter.jsx (route /quan-ly-tep)
+  - frontend/src/shared/api/invoiceApi.js
+  - frontend/src/shared/api/invoiceApi.test.js
+  - frontend/src/shared/api/paymentApi.js
+  - frontend/src/shared/api/paymentApi.test.js
+  - frontend/src/features/billing/billingHelpers.js
+  - frontend/src/features/billing/InvoiceCard.jsx
+  - frontend/src/features/billing/InvoiceCard.test.jsx
+  - frontend/src/features/billing/PaymentRow.jsx
+  - frontend/src/features/billing/PaymentRow.test.jsx
+  - frontend/src/pages/BillingPage.jsx
+  - frontend/src/app/AppRouter.jsx (route /thanh-toan)
   - frontend/src/layouts/navItems.js (them link)
   - frontend/src/layouts/navItems.test.js (cap nhat test)
 - Ket qua test:
   - npm run lint: PASS
-  - npm run test: PASS (30/30 tests)
+  - npm run test: PASS (49/49 tests)
   - npm run build: PASS
 
-### Chuc nang #12 tro di
+### Chuc nang #8 tro di
 - Trang thai: CHUA BAT DAU
 
 ---
 Cap nhat: 2026-04-02
-Trang thai: Frontend da hoan thanh den chuc nang #7 (file upload multipart)
+Trang thai: Frontend da hoan thanh den chuc nang #12 (invoice/payment views)

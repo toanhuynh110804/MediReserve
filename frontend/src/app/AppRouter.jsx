@@ -12,6 +12,7 @@ import { PatientPage } from '../pages/PatientPage'
 import { DoctorPage } from '../pages/DoctorPage'
 import { StaffPage } from '../pages/StaffPage'
 import { FileManagerPage } from '../pages/FileManagerPage'
+import { BillingPage } from '../pages/BillingPage'
 import { UnauthorizedPage } from '../pages/UnauthorizedPage'
 import { NotFoundPage } from '../pages/NotFoundPage'
 
@@ -28,6 +29,7 @@ export function AppRouter() {
           <Route path="/app" element={<RoleHomeRedirect />} />
           <Route path="/tong-quan" element={<DashboardPage />} />
           <Route path="/quan-ly-tep" element={<FileManagerPage />} />
+          <Route path="/thanh-toan" element={<BillingPage />} />
 
           <Route element={<RequireRole roles={['patient']} />}>
             <Route path="/benh-nhan" element={<PatientPage />} />
