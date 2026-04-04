@@ -16,10 +16,14 @@ export function buildNavItems(isAuthenticated, role) {
   const roleItems = {
     [ROLES.admin]: [{ to: '/quan-tri', label: 'Quản trị' }],
     [ROLES.doctor]: [{ to: '/bac-si', label: 'Khu bác sĩ' }],
-    [ROLES.staff]: [{ to: '/nhan-vien', label: 'Khu nhân viên' }],
+    [ROLES.staff]: [
+      { to: '/nhan-vien', label: 'Khu nhân viên' },
+      { to: '/tro-chuyen', label: 'Chat bệnh nhân' },
+    ],
     [ROLES.patient]: [
       { to: '/benh-nhan', label: 'Khu bệnh nhân' },
       { to: '/thanh-toan', label: 'Thanh toán' },
+      { to: '/tro-chuyen', label: 'Chat hỗ trợ' },
     ],
   }
 
