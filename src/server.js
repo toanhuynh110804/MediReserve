@@ -25,6 +25,18 @@ connectDB()
           socket.join(`user:${payload.userId}`);
         }
       });
+
+      socket.on('join-chat-room', (payload = {}) => {
+        if (payload.roomId) {
+          socket.join(`chat:${payload.roomId}`);
+        }
+      });
+
+      socket.on('leave-chat-room', (payload = {}) => {
+        if (payload.roomId) {
+          socket.leave(`chat:${payload.roomId}`);
+        }
+      });
     });
 
     server.listen(PORT, () => {
