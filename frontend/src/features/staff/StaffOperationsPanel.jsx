@@ -1,12 +1,15 @@
 import { useCallback, useEffect, useMemo, useState } from 'react'
+import { getDepartmentsApi, getHospitalsApi } from '../../shared/api/catalogApi'
 import { getDoctorsApi, getSchedulesApi } from '../../shared/api/patientAppointmentsApi'
 import { getPatientsApi } from '../../shared/api/patientApi'
 import { getUsersApi } from '../../shared/api/userManagementApi'
 import {
   cancelStaffAppointmentApi,
   createPatientApi,
+  createStaffScheduleApi,
   createStaffAppointmentApi,
   getStaffAppointmentsApi,
+  getStaffRoomsApi,
   markAppointmentArrivedApi,
   updatePatientApi,
 } from '../../shared/api/staffWorkspaceApi'
@@ -22,6 +25,16 @@ const INITIAL_PATIENT_FORM = {
   insurancePolicyNumber: '',
   insuranceCoverage: '',
   insuranceValidUntil: '',
+}
+
+const INITIAL_SCHEDULE_FORM = {
+  doctor: '',
+  room: '',
+  department: '',
+  hospital: '',
+  date: '',
+  slot: 'morning',
+  capacity: 1,
 }
 
 function getId(value) {
@@ -95,11 +108,27 @@ function getAppointmentPatientName(appointment) {
   return appointment.patient?.user?.name || appointment.patient?._id || 'N/A'
 }
 
+function buildStaffSchedulePayload(formState) {
+  return {
+    doctor: formState.doctor,
+    room: formState.room,
+    department: formState.department || undefined,
+    hospital: formState.hospital || undefined,
+    date: formState.date,
+    slot: formState.slot,
+    capacity: Number(formState.capacity || 1),
+    status: 'open',
+  }
+}
+
 export function StaffOperationsPanel() {
   const [activeTab, setActiveTab] = useState('patients')
   const [patientUsers, setPatientUsers] = useState([])
   const [patients, setPatients] = useState([])
   const [doctors, setDoctors] = useState([])
+  const [rooms, setRooms] = useState([])
+  const [hospitals, setHospitals] = useState([])
+  const [departments, setDepartments] = useState([])
   const [schedules, setSchedules] = useState([])
   const [appointments, setAppointments] = useState([])
   const [loading, setLoading] = useState(false)
@@ -112,16 +141,20 @@ export function StaffOperationsPanel() {
   const [selectedPatientId, setSelectedPatientId] = useState('')
   const [selectedScheduleId, setSelectedScheduleId] = useState('')
   const [appointmentNotes, setAppointmentNotes] = useState('')
+  const [newScheduleForm, setNewScheduleForm] = useState(INITIAL_SCHEDULE_FORM)
 
   const loadData = useCallback(async () => {
     setLoading(true)
     setError('')
 
     try {
-      const [patientUserData, patientData, doctorData, scheduleData, appointmentData] = await Promise.all([
+      const [patientUserData, patientData, doctorData, roomData, hospitalData, departmentData, scheduleData, appointmentData] = await Promise.all([
         getUsersApi({ role: 'patient' }),
         getPatientsApi(),
         getDoctorsApi(),
+        getStaffRoomsApi(),
+        getHospitalsApi(),
+        getDepartmentsApi(),
         getSchedulesApi(),
         getStaffAppointmentsApi(),
       ])
@@ -129,6 +162,9 @@ export function StaffOperationsPanel() {
       setPatientUsers(patientUserData)
       setPatients(patientData)
       setDoctors(doctorData)
+      setRooms(roomData)
+      setHospitals(hospitalData)
+      setDepartments(departmentData)
       setSchedules((scheduleData || []).filter((item) => item.status === 'open'))
       setAppointments(appointmentData)
       setSelectedPatientId((current) => current || patientData[0]?._id || '')
@@ -208,6 +244,35 @@ export function StaffOperationsPanel() {
       await loadData()
     } catch (requestError) {
       setError(requestError.response?.data?.message || 'Không thể tạo lịch khám.')
+    } finally {
+      setSaving(false)
+    }
+  }
+
+  const handleCreateSchedule = async () => {
+    if (!newScheduleForm.doctor || !newScheduleForm.room || !newScheduleForm.date) {
+      setError('Cần chọn bác sĩ, phòng và ngày khám để tạo lịch mới.')
+      return
+    }
+
+    setSaving(true)
+    setError('')
+    setMessage('')
+
+    try {
+      const payload = buildStaffSchedulePayload(newScheduleForm)
+      const createdSchedule = await createStaffScheduleApi(payload)
+      setMessage('Đã tạo lịch khám mới. Bạn có thể chọn lịch này để tạo lịch hẹn.')
+      setNewScheduleForm((current) => ({
+        ...current,
+        date: '',
+      }))
+      await loadData()
+      if (createdSchedule?._id) {
+        setSelectedScheduleId(createdSchedule._id)
+      }
+    } catch (requestError) {
+      setError(requestError.response?.data?.message || 'Không thể tạo lịch khám mới.')
     } finally {
       setSaving(false)
     }
@@ -329,6 +394,108 @@ export function StaffOperationsPanel() {
 
       {activeTab === 'appointments' && (
         <>
+          <div className="panel">
+            <h2>Tạo lịch khám mới</h2>
+            <p className="muted">Nhân viên có thể chủ động mở lịch mới để tiếp nhận bệnh nhân tại quầy.</p>
+
+            <label htmlFor="new-schedule-doctor">Bác sĩ</label>
+            <select
+              id="new-schedule-doctor"
+              value={newScheduleForm.doctor}
+              onChange={(event) => setNewScheduleForm((current) => ({ ...current, doctor: event.target.value }))}
+              disabled={saving}
+            >
+              <option value="">Chọn bác sĩ</option>
+              {doctors.map((doctor) => (
+                <option key={doctor._id} value={doctor._id}>
+                  {doctor.user?.name || doctor._id}
+                </option>
+              ))}
+            </select>
+
+            <label htmlFor="new-schedule-room">Phòng</label>
+            <select
+              id="new-schedule-room"
+              value={newScheduleForm.room}
+              onChange={(event) => setNewScheduleForm((current) => ({ ...current, room: event.target.value }))}
+              disabled={saving}
+            >
+              <option value="">Chọn phòng</option>
+              {rooms.map((room) => (
+                <option key={room._id} value={room._id}>
+                  {room.code || room.roomNumber || room._id}
+                </option>
+              ))}
+            </select>
+
+            <label htmlFor="new-schedule-hospital">Bệnh viện (tùy chọn)</label>
+            <select
+              id="new-schedule-hospital"
+              value={newScheduleForm.hospital}
+              onChange={(event) => setNewScheduleForm((current) => ({ ...current, hospital: event.target.value }))}
+              disabled={saving}
+            >
+              <option value="">Không chọn</option>
+              {hospitals.map((hospital) => (
+                <option key={hospital._id} value={hospital._id}>
+                  {hospital.name || hospital._id}
+                </option>
+              ))}
+            </select>
+
+            <label htmlFor="new-schedule-department">Khoa (tùy chọn)</label>
+            <select
+              id="new-schedule-department"
+              value={newScheduleForm.department}
+              onChange={(event) => setNewScheduleForm((current) => ({ ...current, department: event.target.value }))}
+              disabled={saving}
+            >
+              <option value="">Không chọn</option>
+              {departments.map((department) => (
+                <option key={department._id} value={department._id}>
+                  {department.name || department._id}
+                </option>
+              ))}
+            </select>
+
+            <label htmlFor="new-schedule-date">Ngày khám</label>
+            <input
+              id="new-schedule-date"
+              type="date"
+              value={newScheduleForm.date}
+              onChange={(event) => setNewScheduleForm((current) => ({ ...current, date: event.target.value }))}
+              disabled={saving}
+            />
+
+            <label htmlFor="new-schedule-slot">Ca khám</label>
+            <select
+              id="new-schedule-slot"
+              value={newScheduleForm.slot}
+              onChange={(event) => setNewScheduleForm((current) => ({ ...current, slot: event.target.value }))}
+              disabled={saving}
+            >
+              <option value="morning">morning</option>
+              <option value="afternoon">afternoon</option>
+              <option value="evening">evening</option>
+            </select>
+
+            <label htmlFor="new-schedule-capacity">Số lượng tiếp nhận</label>
+            <input
+              id="new-schedule-capacity"
+              type="number"
+              min="1"
+              value={newScheduleForm.capacity}
+              onChange={(event) => setNewScheduleForm((current) => ({ ...current, capacity: event.target.value }))}
+              disabled={saving}
+            />
+
+            <div className="actions">
+              <button type="button" onClick={handleCreateSchedule} disabled={saving}>
+                Tạo lịch mới
+              </button>
+            </div>
+          </div>
+
           <div className="panel">
             <h2>Tạo lịch khám cho bệnh nhân</h2>
             <p className="muted">Nhân viên là người tạo lịch khám thủ công cho bệnh nhân tại quầy tiếp nhận.</p>

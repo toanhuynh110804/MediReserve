@@ -6,6 +6,16 @@ export async function getStaffAppointmentsApi(filters = {}) {
   return response.data
 }
 
+export async function getStaffRoomsApi() {
+  const response = await httpClient.get('/api/rooms')
+  return response.data
+}
+
+export async function createStaffScheduleApi(data) {
+  const response = await httpClient.post('/api/schedules', data)
+  return response.data
+}
+
 export async function createStaffAppointmentApi(schedule, patientId, notes = '') {
   const payload = {
     ...buildAppointmentPayload(schedule, notes),
