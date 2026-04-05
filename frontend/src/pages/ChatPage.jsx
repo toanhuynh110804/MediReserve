@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo, useState } from 'react'
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { useAuth } from '../features/auth/useAuth'
 import {
   ensureChatRoomApi,
@@ -39,6 +39,7 @@ export function ChatPage() {
   const [draft, setDraft] = useState('')
   const [patients, setPatients] = useState([])
   const [selectedPatientUserId, setSelectedPatientUserId] = useState('')
+  const hasEnsuredPatientRoomRef = useRef(false)
 
   const selectedRoom = useMemo(
     () => rooms.find((item) => item._id === selectedRoomId) || null,
@@ -66,12 +67,17 @@ export function ChatPage() {
     setMessage('')
 
     try {
-      if (role === 'patient') {
-        // Ensure every patient can open at least one room with staff.
-        await ensureChatRoomApi({})
-      }
+      const roomData = await getChatRoomsApi()
+      setRooms(roomData)
+      setSelectedRoomId((current) => current || roomData[0]?._id || '')
 
-      await loadRooms()
+      if (role === 'patient' && roomData.length === 0 && !hasEnsuredPatientRoomRef.current) {
+        hasEnsuredPatientRoomRef.current = true
+        await ensureChatRoomApi({})
+        const refreshedRooms = await getChatRoomsApi()
+        setRooms(refreshedRooms)
+        setSelectedRoomId((current) => current || refreshedRooms[0]?._id || '')
+      }
 
       if (role === 'staff') {
         const patientUsers = await getUsersApi({ role: 'patient' })

@@ -101,14 +101,26 @@ exports.ensureRoom = async (req, res) => {
   if (!patientUser) return res.status(400).json({ message: 'Bệnh nhân không hợp lệ' });
   if (!staffUser) return res.status(400).json({ message: 'Nhân viên không hợp lệ' });
 
-  let room = await ChatRoom.findOne({ patientUser: patientUser._id, staffUser: staffUser._id });
-  if (!room) {
-    room = await ChatRoom.create({
-      patientUser: patientUser._id,
-      staffUser: staffUser._id,
-      participants: [patientUser._id, staffUser._id],
-      lastMessageAt: new Date(),
+  const roomQuery = { patientUser: patientUser._id, staffUser: staffUser._id };
+  const roomInsert = {
+    patientUser: patientUser._id,
+    staffUser: staffUser._id,
+    participants: [patientUser._id, staffUser._id],
+    lastMessageAt: new Date(),
+  };
+
+  let room;
+  try {
+    room = await ChatRoom.findOneAndUpdate(roomQuery, { $setOnInsert: roomInsert }, {
+      upsert: true,
+      new: true,
+      setDefaultsOnInsert: true,
     });
+  } catch (error) {
+    if (error?.code !== 11000) {
+      throw error;
+    }
+    room = await ChatRoom.findOne(roomQuery);
   }
 
   const populatedRoom = await ChatRoom.findById(room._id)
