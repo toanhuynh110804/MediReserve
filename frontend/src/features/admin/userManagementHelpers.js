@@ -20,11 +20,30 @@ export function buildRolePayload(formState) {
   }
 }
 
+export function buildAdminUserPayload(formState) {
+  return {
+    name: formState.name.trim(),
+    email: formState.email.trim().toLowerCase(),
+    password: formState.password,
+    role: formState.role,
+    phone: formState.phone.trim(),
+  }
+}
+
+export function getInitialAdminUserForm() {
+  return {
+    name: '',
+    email: '',
+    password: '',
+    role: 'staff',
+    phone: '',
+  }
+}
+
 export function buildStaffPayload(formState) {
   return {
     user: formState.user,
-    hospital: formState.hospital || undefined,
-    department: formState.department || undefined,
+    department: formState.department,
     title: formState.title.trim(),
     role: formState.role,
     status: formState.status,
@@ -35,7 +54,6 @@ export function getInitialStaffForm(staff) {
   if (!staff) {
     return {
       user: '',
-      hospital: '',
       department: '',
       title: '',
       role: 'staff',
@@ -45,7 +63,6 @@ export function getInitialStaffForm(staff) {
 
   return {
     user: staff.user?._id || staff.user || '',
-    hospital: staff.hospital?._id || staff.hospital || '',
     department: staff.department?._id || staff.department || '',
     title: staff.title || '',
     role: staff.role || 'staff',

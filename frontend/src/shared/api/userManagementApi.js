@@ -8,6 +8,11 @@ export async function getUsersApi(filters = {}) {
   return response.data
 }
 
+export async function createUserByAdminApi(data) {
+  const response = await httpClient.post('/api/users', data)
+  return response.data
+}
+
 export async function getStaffsApi() {
   const response = await httpClient.get('/api/staff')
   return response.data

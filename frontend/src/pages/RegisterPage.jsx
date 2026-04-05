@@ -6,7 +6,6 @@ const defaultForm = {
   name: '',
   email: '',
   password: '',
-  role: 'patient',
 }
 
 export function RegisterPage() {
@@ -38,7 +37,7 @@ export function RegisterPage() {
   return (
     <section>
       <h1>Đăng ký tài khoản</h1>
-      <p>Tạo tài khoản mới để sử dụng hệ thống MediReserve.</p>
+      <p>Tạo tài khoản bệnh nhân để sử dụng hệ thống MediReserve.</p>
 
       <form className="auth-form" onSubmit={handleSubmit}>
         <label htmlFor="register-name">Họ và tên</label>
@@ -71,14 +70,6 @@ export function RegisterPage() {
           minLength={6}
           required
         />
-
-        <label htmlFor="register-role">Vai trò</label>
-        <select id="register-role" value={formData.role} onChange={handleChange('role')}>
-          <option value="patient">Bệnh nhân</option>
-          <option value="doctor">Bác sĩ</option>
-          <option value="staff">Nhân viên</option>
-          <option value="admin">Quản trị viên</option>
-        </select>
 
         {error ? <p className="form-error">{error}</p> : null}
 

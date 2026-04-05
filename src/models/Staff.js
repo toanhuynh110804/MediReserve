@@ -4,7 +4,7 @@ const staffSchema = new mongoose.Schema(
   {
     user: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true },
     hospital: { type: mongoose.Schema.Types.ObjectId, ref: 'Hospital' },
-    department: { type: mongoose.Schema.Types.ObjectId, ref: 'Department' },
+    department: { type: mongoose.Schema.Types.ObjectId, ref: 'Department', required: true },
     title: String,
     role: { type: String, enum: ['staff', 'admin', 'manager'], default: 'staff' },
     status: { type: String, enum: ['active', 'inactive'], default: 'active' },

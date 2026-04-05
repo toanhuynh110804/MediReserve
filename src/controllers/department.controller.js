@@ -1,8 +1,15 @@
 const Department = require('../models/Department');
+const { getSystemHospitalId } = require('../config/systemHospital');
 
 exports.create = async (req, res) => {
-  const department = await Department.create(req.body);
-  res.status(201).json(department);
+  const { name, description } = req.body;
+  const department = await Department.create({
+    name,
+    description,
+    hospital: getSystemHospitalId(),
+  });
+  const populated = await Department.findById(department._id).populate('hospital');
+  res.status(201).json(populated);
 };
 
 exports.getAll = async (req, res) => {
@@ -17,7 +24,9 @@ exports.getById = async (req, res) => {
 };
 
 exports.updateById = async (req, res) => {
-  const department = await Department.findByIdAndUpdate(req.params.id, req.body, { new: true });
+  const { name, description } = req.body;
+  const update = { name, description, hospital: getSystemHospitalId() };
+  const department = await Department.findByIdAndUpdate(req.params.id, update, { new: true }).populate('hospital');
   if (!department) return res.status(404).json({ message: 'Department không tồn tại' });
   res.json(department);
 };

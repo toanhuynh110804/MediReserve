@@ -1,8 +1,11 @@
 const Doctor = require('../models/Doctor');
+const { getSystemHospitalId } = require('../config/systemHospital');
 
 exports.create = async (req, res) => {
-  const doctor = await Doctor.create(req.body);
-  res.status(201).json(doctor);
+  const data = { ...req.body, hospital: getSystemHospitalId() };
+  const doctor = await Doctor.create(data);
+  const populated = await Doctor.findById(doctor._id).populate('user specialties hospital department');
+  res.status(201).json(populated);
 };
 
 exports.getAll = async (req, res) => {
@@ -17,7 +20,8 @@ exports.getById = async (req, res) => {
 };
 
 exports.updateById = async (req, res) => {
-  const doctor = await Doctor.findByIdAndUpdate(req.params.id, req.body, { new: true }).populate('user specialties hospital department');
+  const data = { ...req.body, hospital: getSystemHospitalId() };
+  const doctor = await Doctor.findByIdAndUpdate(req.params.id, data, { new: true }).populate('user specialties hospital department');
   if (!doctor) return res.status(404).json({ message: 'Doctor không tồn tại' });
   res.json(doctor);
 };

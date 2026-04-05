@@ -10,7 +10,7 @@ export function AdminPage() {
   return (
     <section>
       <h1>Khu vực quản trị</h1>
-      <p>Admin chỉ nhìn thấy các chức năng quản trị hệ thống, không hiển thị nghiệp vụ khám chữa bệnh của bác sĩ hay tiếp nhận của nhân viên.</p>
+      <p>Admin quản trị khoa, chuyên khoa, bác sĩ, phòng, lịch làm việc và nhân sự của Bệnh viện Đa Khoa Thủ Đức.</p>
 
       <div className="actions" style={{ flexWrap: 'wrap', marginBottom: '1rem' }}>
         <button

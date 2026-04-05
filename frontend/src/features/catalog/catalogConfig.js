@@ -1,45 +1,21 @@
-export const CATALOG_ORDER = ['hospital', 'department', 'specialty', 'medicine', 'insurance']
+export const CATALOG_ORDER = ['department', 'specialty', 'medicine', 'insurance']
 
 export const CATALOG_SCOPE_GROUPS = {
-  admin: ['hospital', 'department', 'specialty'],
+  admin: ['department', 'specialty'],
   staff: ['medicine', 'insurance'],
 }
 
 export const CATALOG_CONFIG = {
-  hospital: {
-    label: 'Bệnh viện',
-    createRoles: ['admin'],
-    deleteRoles: ['admin'],
-    fields: [
-      { key: 'name', label: 'Tên bệnh viện', type: 'text', required: true },
-      { key: 'description', label: 'Mô tả', type: 'textarea' },
-      { key: 'phone', label: 'Số điện thoại', type: 'text' },
-      { key: 'email', label: 'Email', type: 'email' },
-      { key: 'website', label: 'Website', type: 'text' },
-      { key: 'address.street', label: 'Địa chỉ', type: 'text' },
-      { key: 'address.city', label: 'Thành phố', type: 'text' },
-      { key: 'address.state', label: 'Tỉnh/Bang', type: 'text' },
-      { key: 'address.zip', label: 'Mã bưu chính', type: 'text' },
-      { key: 'address.country', label: 'Quốc gia', type: 'text' },
-    ],
-    columns: [
-      { label: 'Tên', render: (item) => item.name || 'N/A' },
-      { label: 'Liên hệ', render: (item) => item.phone || item.email || 'N/A' },
-      { label: 'Địa điểm', render: (item) => item.address?.city || item.address?.country || 'N/A' },
-    ],
-  },
   department: {
     label: 'Khoa',
     createRoles: ['admin'],
     deleteRoles: ['admin'],
     fields: [
       { key: 'name', label: 'Tên khoa', type: 'text', required: true },
-      { key: 'hospital', label: 'Bệnh viện', type: 'select', required: true, optionsKey: 'hospitals' },
       { key: 'description', label: 'Mô tả', type: 'textarea' },
     ],
     columns: [
       { label: 'Tên', render: (item) => item.name || 'N/A' },
-      { label: 'Bệnh viện', render: (item) => item.hospital?.name || 'N/A' },
       { label: 'Mô tả', render: (item) => item.description || 'N/A' },
     ],
   },

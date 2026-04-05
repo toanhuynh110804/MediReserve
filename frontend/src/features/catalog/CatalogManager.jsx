@@ -1,21 +1,17 @@
 import { useCallback, useEffect, useMemo, useState } from 'react'
 import {
   createDepartmentApi,
-  createHospitalApi,
   createInsuranceApi,
   createMedicineApi,
   createSpecialtyApi,
   deleteDepartmentApi,
-  deleteHospitalApi,
   deleteInsuranceApi,
   deleteMedicineApi,
   deleteSpecialtyApi,
   getDepartmentsApi,
-  getHospitalsApi,
   getInsurancesApi,
   getSpecialtiesApi,
   updateDepartmentApi,
-  updateHospitalApi,
   updateInsuranceApi,
   updateMedicineApi,
   updateSpecialtyApi,
@@ -34,7 +30,6 @@ import {
 } from './catalogHelpers'
 
 const LOADERS = {
-  hospitals: getHospitalsApi,
   departments: getDepartmentsApi,
   specialties: getSpecialtiesApi,
   medicines: getMedicinesApi,
@@ -43,7 +38,6 @@ const LOADERS = {
 }
 
 const MUTATIONS = {
-  hospital: { create: createHospitalApi, update: updateHospitalApi, delete: deleteHospitalApi },
   department: { create: createDepartmentApi, update: updateDepartmentApi, delete: deleteDepartmentApi },
   specialty: { create: createSpecialtyApi, update: updateSpecialtyApi, delete: deleteSpecialtyApi },
   medicine: { create: createMedicineApi, update: updateMedicineApi, delete: deleteMedicineApi },
@@ -54,7 +48,6 @@ export function CatalogManager({ role, title, description, catalogKeys = CATALOG
   const availableCatalogKeys = catalogKeys.length > 0 ? catalogKeys : CATALOG_ORDER
   const [activeTab, setActiveTab] = useState(() => availableCatalogKeys[0])
   const [catalogData, setCatalogData] = useState({
-    hospitals: [],
     departments: [],
     specialties: [],
     medicines: [],
@@ -90,8 +83,7 @@ export function CatalogManager({ role, title, description, catalogKeys = CATALOG
     setError('')
 
     try {
-      const [hospitals, departments, specialties, medicines, insurances, patients] = await Promise.all([
-        LOADERS.hospitals(),
+      const [departments, specialties, medicines, insurances, patients] = await Promise.all([
         LOADERS.departments(),
         LOADERS.specialties(),
         LOADERS.medicines(),
@@ -99,7 +91,7 @@ export function CatalogManager({ role, title, description, catalogKeys = CATALOG
         LOADERS.patients(),
       ])
 
-      setCatalogData({ hospitals, departments, specialties, medicines, insurances, patients })
+      setCatalogData({ departments, specialties, medicines, insurances, patients })
     } catch (err) {
       setError(err.response?.data?.message || 'Không thể tải dữ liệu danh mục.')
     } finally {

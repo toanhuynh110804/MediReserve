@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useMemo, useState } from 'react'
-import { getDepartmentsApi, getHospitalsApi, getSpecialtiesApi } from '../../shared/api/catalogApi'
+import { getDepartmentsApi, getSpecialtiesApi } from '../../shared/api/catalogApi'
 import {
   createDoctorApi,
   createRoomApi,
@@ -19,7 +19,6 @@ import { getUsersApi } from '../../shared/api/userManagementApi'
 
 const INITIAL_DOCTOR_FORM = {
   user: '',
-  hospital: '',
   department: '',
   specialties: [],
   qualifications: '',
@@ -42,7 +41,6 @@ const INITIAL_SCHEDULE_FORM = {
   doctor: '',
   room: '',
   department: '',
-  hospital: '',
   date: '',
   slot: 'morning',
   capacity: 1,
@@ -57,7 +55,6 @@ function toDateInput(value) {
 function buildDoctorPayload(formState) {
   return {
     user: formState.user,
-    hospital: formState.hospital || undefined,
     department: formState.department || undefined,
     specialties: formState.specialties,
     qualifications: formState.qualifications.trim(),
@@ -84,7 +81,6 @@ function buildSchedulePayload(formState) {
     doctor: formState.doctor,
     room: formState.room,
     department: formState.department || undefined,
-    hospital: formState.hospital || undefined,
     date: formState.date,
     slot: formState.slot,
     capacity: Number(formState.capacity || 1),
@@ -96,7 +92,6 @@ function getDoctorFormState(doctor) {
   if (!doctor) return INITIAL_DOCTOR_FORM
   return {
     user: doctor.user?._id || doctor.user || '',
-    hospital: doctor.hospital?._id || doctor.hospital || '',
     department: doctor.department?._id || doctor.department || '',
     specialties: Array.isArray(doctor.specialties) ? doctor.specialties.map((item) => item._id || item) : [],
     qualifications: doctor.qualifications || '',
@@ -125,7 +120,6 @@ function getScheduleFormState(schedule) {
     doctor: schedule.doctor?._id || schedule.doctor || '',
     room: schedule.room?._id || schedule.room || '',
     department: schedule.department?._id || schedule.department || '',
-    hospital: schedule.hospital?._id || schedule.hospital || '',
     date: toDateInput(schedule.date),
     slot: schedule.slot || 'morning',
     capacity: schedule.capacity ?? 1,
@@ -148,7 +142,6 @@ export function AdminOperationsPanel() {
   const [rooms, setRooms] = useState([])
   const [schedules, setSchedules] = useState([])
   const [appointments, setAppointments] = useState([])
-  const [hospitals, setHospitals] = useState([])
   const [departments, setDepartments] = useState([])
   const [specialties, setSpecialties] = useState([])
   const [loading, setLoading] = useState(false)
@@ -167,13 +160,12 @@ export function AdminOperationsPanel() {
     setError('')
 
     try {
-      const [doctorUsers, doctorData, roomData, scheduleData, appointmentData, hospitalData, departmentData, specialtyData] = await Promise.all([
+      const [doctorUsers, doctorData, roomData, scheduleData, appointmentData, departmentData, specialtyData] = await Promise.all([
         getUsersApi({ role: 'doctor' }),
         getAdminDoctorsApi(),
         getRoomsApi(),
         getAdminSchedulesApi(),
         getAdminAppointmentsApi(),
-        getHospitalsApi(),
         getDepartmentsApi(),
         getSpecialtiesApi(),
       ])
@@ -183,7 +175,6 @@ export function AdminOperationsPanel() {
       setRooms(roomData)
       setSchedules(scheduleData)
       setAppointments(appointmentData)
-      setHospitals(hospitalData)
       setDepartments(departmentData)
       setSpecialties(specialtyData)
     } catch (requestError) {
@@ -202,7 +193,6 @@ export function AdminOperationsPanel() {
     [users],
   )
 
-  const hospitalOptions = useMemo(() => hospitals.map((item) => ({ value: item._id, label: item.name })), [hospitals])
   const departmentOptions = useMemo(() => departments.map((item) => ({ value: item._id, label: item.name })), [departments])
   const specialtyOptions = useMemo(() => specialties.map((item) => ({ value: item._id, label: item.name })), [specialties])
   const roomOptions = useMemo(() => rooms.map((item) => ({ value: item._id, label: `${item.code} - ${item.department?.name || 'N/A'}` })), [rooms])
@@ -351,7 +341,6 @@ export function AdminOperationsPanel() {
                 <thead>
                   <tr>
                     <th>Bác sĩ</th>
-                    <th>Bệnh viện</th>
                     <th>Khoa</th>
                     <th>Trạng thái</th>
                     <th>Hành động</th>
@@ -361,7 +350,6 @@ export function AdminOperationsPanel() {
                   {doctors.map((doctor) => (
                     <tr key={doctor._id}>
                       <td>{getDoctorName(doctor)}</td>
-                      <td>{doctor.hospital?.name || 'N/A'}</td>
                       <td>{doctor.department?.name || 'N/A'}</td>
                       <td>{doctor.active ? 'Đang hoạt động' : 'Đã khóa'}</td>
                       <td>
@@ -383,11 +371,6 @@ export function AdminOperationsPanel() {
             <select id="doctor-user" value={doctorForm.user} onChange={(event) => setDoctorForm((current) => ({ ...current, user: event.target.value }))} disabled={saving} required>
               <option value="">Chọn user bác sĩ</option>
               {doctorUserOptions.map((option) => <option key={option.value} value={option.value}>{option.label}</option>)}
-            </select>
-            <label htmlFor="doctor-hospital">Bệnh viện</label>
-            <select id="doctor-hospital" value={doctorForm.hospital} onChange={(event) => setDoctorForm((current) => ({ ...current, hospital: event.target.value }))} disabled={saving}>
-              <option value="">Chọn bệnh viện</option>
-              {hospitalOptions.map((option) => <option key={option.value} value={option.value}>{option.label}</option>)}
             </select>
             <label htmlFor="doctor-department">Khoa</label>
             <select id="doctor-department" value={doctorForm.department} onChange={(event) => setDoctorForm((current) => ({ ...current, department: event.target.value }))} disabled={saving}>
@@ -545,11 +528,6 @@ export function AdminOperationsPanel() {
             <select id="schedule-room" value={scheduleForm.room} onChange={(event) => setScheduleForm((current) => ({ ...current, room: event.target.value }))} disabled={saving} required>
               <option value="">Chọn phòng</option>
               {roomOptions.map((option) => <option key={option.value} value={option.value}>{option.label}</option>)}
-            </select>
-            <label htmlFor="schedule-hospital">Bệnh viện</label>
-            <select id="schedule-hospital" value={scheduleForm.hospital} onChange={(event) => setScheduleForm((current) => ({ ...current, hospital: event.target.value }))} disabled={saving}>
-              <option value="">Chọn bệnh viện</option>
-              {hospitalOptions.map((option) => <option key={option.value} value={option.value}>{option.label}</option>)}
             </select>
             <label htmlFor="schedule-department">Khoa</label>
             <select id="schedule-department" value={scheduleForm.department} onChange={(event) => setScheduleForm((current) => ({ ...current, department: event.target.value }))} disabled={saving}>

@@ -3,13 +3,18 @@ const http = require('http');
 const { Server } = require('socket.io');
 const app = require('./app');
 const connectDB = require('./config/db');
+const { ensureSystemAdminAccount } = require('./config/systemAdmin');
+const { ensureSystemHospital } = require('./config/systemHospital');
 
 dotenv.config({ override: true });
 
 const PORT = process.env.PORT || 4000;
 
 connectDB()
-  .then(() => {
+  .then(async () => {
+    await ensureSystemAdminAccount();
+    await ensureSystemHospital();
+
     const server = http.createServer(app);
     const io = new Server(server, {
       cors: {
