@@ -1,5 +1,6 @@
 const Hospital = require('../models/Hospital');
 const Department = require('../models/Department');
+const Specialty = require('../models/Specialty');
 
 let _systemHospitalId = null;
 
@@ -24,6 +25,37 @@ const DEFAULT_DEPARTMENTS = [
   { name: 'Khoa Chẩn đoán hình ảnh', description: 'X-quang, siêu âm, CT, MRI' },
   { name: 'Khoa Xét nghiệm', description: 'Xét nghiệm máu, nước tiểu và các xét nghiệm lâm sàng' },
   { name: 'Khoa Phục hồi chức năng', description: 'Phục hồi chức năng sau chấn thương và bệnh tật' },
+];
+
+const DEFAULT_SPECIALTIES = [
+  { name: 'Hồi sức cấp cứu', description: 'Đánh giá, xử trí và hồi sức cho ca cấp cứu, nguy kịch' },
+  { name: 'Nội tim mạch', description: 'Chẩn đoán và điều trị bệnh lý tim mạch nội khoa' },
+  { name: 'Nội hô hấp', description: 'Điều trị các bệnh lý hô hấp và phổi' },
+  { name: 'Nội tiêu hóa - gan mật', description: 'Điều trị các bệnh lý tiêu hóa, gan và mật' },
+  { name: 'Nội tiết', description: 'Chẩn đoán và điều trị rối loạn nội tiết, chuyển hóa' },
+  { name: 'Thận - tiết niệu', description: 'Điều trị các bệnh lý thận và đường tiết niệu' },
+  { name: 'Ngoại tổng quát', description: 'Phẫu thuật và chăm sóc hậu phẫu bệnh ngoại khoa tổng quát' },
+  { name: 'Ngoại thần kinh', description: 'Can thiệp ngoại khoa bệnh lý thần kinh và sọ não' },
+  { name: 'Ngoại chấn thương chỉnh hình', description: 'Điều trị chấn thương và bệnh lý cơ xương khớp bằng phẫu thuật' },
+  { name: 'Sản khoa', description: 'Theo dõi thai kỳ, đỡ sinh và chăm sóc sau sinh' },
+  { name: 'Phụ khoa', description: 'Khám, điều trị bệnh lý phụ khoa và sức khỏe sinh sản nữ' },
+  { name: 'Nhi tổng quát', description: 'Khám và điều trị bệnh lý thường gặp ở trẻ em' },
+  { name: 'Nhi hô hấp', description: 'Điều trị bệnh hô hấp ở trẻ em' },
+  { name: 'Nhi tiêu hóa', description: 'Điều trị bệnh tiêu hóa ở trẻ em' },
+  { name: 'Tim mạch can thiệp', description: 'Can thiệp mạch vành và tim mạch ít xâm lấn' },
+  { name: 'Thần kinh', description: 'Chẩn đoán và điều trị bệnh lý thần kinh' },
+  { name: 'Cơ xương khớp', description: 'Điều trị bệnh lý cơ xương khớp và mô liên kết' },
+  { name: 'Da liễu', description: 'Khám và điều trị bệnh da, tóc, móng' },
+  { name: 'Tai Mũi Họng', description: 'Khám và điều trị bệnh lý tai, mũi, họng' },
+  { name: 'Nhãn khoa', description: 'Khám và điều trị bệnh lý mắt' },
+  { name: 'Răng Hàm Mặt', description: 'Điều trị bệnh lý răng miệng và hàm mặt' },
+  { name: 'Ung bướu', description: 'Chẩn đoán, điều trị và theo dõi bệnh lý ung thư' },
+  { name: 'Hồi sức tích cực (ICU)', description: 'Theo dõi và điều trị tích cực cho bệnh nhân nặng' },
+  { name: 'Chẩn đoán hình ảnh', description: 'Thực hiện và đọc kết quả X-quang, CT, MRI, siêu âm' },
+  { name: 'Xét nghiệm huyết học', description: 'Thực hiện xét nghiệm huyết học và đông máu' },
+  { name: 'Xét nghiệm sinh hóa', description: 'Thực hiện xét nghiệm sinh hóa máu, nước tiểu' },
+  { name: 'Vi sinh', description: 'Xét nghiệm vi sinh và định danh tác nhân gây bệnh' },
+  { name: 'Phục hồi chức năng', description: 'Vật lý trị liệu và phục hồi chức năng sau điều trị' },
 ];
 
 /**
@@ -67,6 +99,16 @@ async function ensureSystemHospital() {
     const docs = DEFAULT_DEPARTMENTS.map((d) => ({ ...d, hospital: _systemHospitalId }));
     await Department.insertMany(docs);
     console.log(`[SystemHospital] Đã tạo ${docs.length} khoa mặc định.`);
+  }
+
+  // Seed chuyên khoa mặc định theo các khoa hiện có (chỉ thêm phần còn thiếu)
+  const existingSpecialties = await Specialty.find({}, 'name').lean();
+  const existingNames = new Set(existingSpecialties.map((item) => item.name));
+  const specialtiesToInsert = DEFAULT_SPECIALTIES.filter((item) => !existingNames.has(item.name));
+
+  if (specialtiesToInsert.length > 0) {
+    await Specialty.insertMany(specialtiesToInsert);
+    console.log(`[SystemHospital] Đã tạo thêm ${specialtiesToInsert.length} chuyên khoa mặc định.`);
   }
 }
 

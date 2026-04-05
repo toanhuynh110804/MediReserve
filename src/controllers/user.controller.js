@@ -18,12 +18,12 @@ exports.getAll = async (req, res) => {
   res.json(users);
 };
 
-/** Admin tạo tài khoản user nội bộ (staff/doctor) */
+/** Admin tạo tài khoản user nội bộ (staff/doctor/patient) */
 exports.createByAdmin = async (req, res) => {
   const { name, email, password, role, phone, address } = req.body;
 
-  if (!['staff', 'doctor'].includes(role)) {
-    return res.status(400).json({ message: 'Admin chỉ được tạo tài khoản staff hoặc doctor' });
+  if (!['staff', 'doctor', 'patient'].includes(role)) {
+    return res.status(400).json({ message: 'Admin chỉ được tạo tài khoản staff, doctor hoặc patient' });
   }
 
   const existing = await User.findOne({ email });
@@ -43,6 +43,7 @@ exports.createByAdmin = async (req, res) => {
 
   return res.status(201).json({
     user: {
+      _id: user._id,
       id: user._id,
       name: user.name,
       email: user.email,

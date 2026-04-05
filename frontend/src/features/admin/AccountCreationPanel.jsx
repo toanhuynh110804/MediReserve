@@ -28,6 +28,10 @@ const getInitialDoctorAccountForm = () => ({
   bio: '',
 })
 
+function getCreatedUserId(result) {
+  return result?.user?._id || result?.user?.id || ''
+}
+
 export function AccountCreationPanel() {
   const [activeTab, setActiveTab] = useState('patient')
   const [departments, setDepartments] = useState([])
@@ -88,8 +92,12 @@ export function AccountCreationPanel() {
         phone: staffAccountForm.phone,
         role: 'staff',
       })
+      const createdUserId = getCreatedUserId(userResult)
+      if (!createdUserId) {
+        throw new Error('Không lấy được ID user vừa tạo')
+      }
       await createStaffApi({
-        user: userResult.user._id,
+        user: createdUserId,
         department: staffAccountForm.department,
         title: staffAccountForm.title,
         role: 'staff',
@@ -117,8 +125,12 @@ export function AccountCreationPanel() {
         phone: doctorAccountForm.phone,
         role: 'doctor',
       })
+      const createdUserId = getCreatedUserId(userResult)
+      if (!createdUserId) {
+        throw new Error('Không lấy được ID user vừa tạo')
+      }
       await createDoctorApi({
-        user: userResult.user._id,
+        user: createdUserId,
         department: doctorAccountForm.department || undefined,
         specialties: doctorAccountForm.specialties,
         qualifications: doctorAccountForm.qualifications.trim(),
