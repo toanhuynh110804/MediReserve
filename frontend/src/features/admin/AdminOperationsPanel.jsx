@@ -1,32 +1,17 @@
 import { useCallback, useEffect, useMemo, useState } from 'react'
 import { getDepartmentsApi, getSpecialtiesApi } from '../../shared/api/catalogApi'
 import {
-  createDoctorApi,
   createRoomApi,
   createScheduleApi,
-  deleteDoctorApi,
   deleteRoomApi,
   deleteScheduleApi,
   getAdminAppointmentsApi,
   getAdminDoctorsApi,
   getAdminSchedulesApi,
   getRoomsApi,
-  updateDoctorApi,
   updateRoomApi,
   updateScheduleApi,
 } from '../../shared/api/adminWorkspaceApi'
-import { getUsersApi } from '../../shared/api/userManagementApi'
-
-const INITIAL_DOCTOR_FORM = {
-  user: '',
-  department: '',
-  specialties: [],
-  qualifications: '',
-  experienceYears: '',
-  bio: '',
-  phone: '',
-  active: true,
-}
 
 const INITIAL_ROOM_FORM = {
   code: '',
@@ -52,19 +37,6 @@ function toDateInput(value) {
   return String(value).slice(0, 10)
 }
 
-function buildDoctorPayload(formState) {
-  return {
-    user: formState.user,
-    department: formState.department || undefined,
-    specialties: formState.specialties,
-    qualifications: formState.qualifications.trim(),
-    experienceYears: formState.experienceYears === '' ? undefined : Number(formState.experienceYears),
-    bio: formState.bio.trim(),
-    phone: formState.phone.trim(),
-    active: Boolean(formState.active),
-  }
-}
-
 function buildRoomPayload(formState) {
   return {
     code: formState.code.trim(),
@@ -85,20 +57,6 @@ function buildSchedulePayload(formState) {
     slot: formState.slot,
     capacity: Number(formState.capacity || 1),
     status: formState.status,
-  }
-}
-
-function getDoctorFormState(doctor) {
-  if (!doctor) return INITIAL_DOCTOR_FORM
-  return {
-    user: doctor.user?._id || doctor.user || '',
-    department: doctor.department?._id || doctor.department || '',
-    specialties: Array.isArray(doctor.specialties) ? doctor.specialties.map((item) => item._id || item) : [],
-    qualifications: doctor.qualifications || '',
-    experienceYears: doctor.experienceYears ?? '',
-    bio: doctor.bio || '',
-    phone: doctor.phone || '',
-    active: doctor.active ?? true,
   }
 }
 
@@ -136,8 +94,8 @@ function getDoctorName(doctor) {
 }
 
 export function AdminOperationsPanel() {
-  const [activeTab, setActiveTab] = useState('doctors')
-  const [users, setUsers] = useState([])
+  const [activeTab, setActiveTab] = useState('rooms')
+
   const [doctors, setDoctors] = useState([])
   const [rooms, setRooms] = useState([])
   const [schedules, setSchedules] = useState([])
@@ -148,10 +106,8 @@ export function AdminOperationsPanel() {
   const [saving, setSaving] = useState(false)
   const [error, setError] = useState('')
   const [message, setMessage] = useState('')
-  const [editingDoctor, setEditingDoctor] = useState(null)
   const [editingRoom, setEditingRoom] = useState(null)
   const [editingSchedule, setEditingSchedule] = useState(null)
-  const [doctorForm, setDoctorForm] = useState(INITIAL_DOCTOR_FORM)
   const [roomForm, setRoomForm] = useState(INITIAL_ROOM_FORM)
   const [scheduleForm, setScheduleForm] = useState(INITIAL_SCHEDULE_FORM)
 
@@ -160,8 +116,7 @@ export function AdminOperationsPanel() {
     setError('')
 
     try {
-      const [doctorUsers, doctorData, roomData, scheduleData, appointmentData, departmentData, specialtyData] = await Promise.all([
-        getUsersApi({ role: 'doctor' }),
+      const [doctorData, roomData, scheduleData, appointmentData, departmentData, specialtyData] = await Promise.all([
         getAdminDoctorsApi(),
         getRoomsApi(),
         getAdminSchedulesApi(),
@@ -170,7 +125,6 @@ export function AdminOperationsPanel() {
         getSpecialtiesApi(),
       ])
 
-      setUsers(doctorUsers)
       setDoctors(doctorData)
       setRooms(roomData)
       setSchedules(scheduleData)
@@ -188,20 +142,10 @@ export function AdminOperationsPanel() {
     loadData()
   }, [loadData])
 
-  const doctorUserOptions = useMemo(
-    () => users.map((user) => ({ value: user._id, label: `${user.name} (${user.email})` })),
-    [users],
-  )
-
   const departmentOptions = useMemo(() => departments.map((item) => ({ value: item._id, label: item.name })), [departments])
   const specialtyOptions = useMemo(() => specialties.map((item) => ({ value: item._id, label: item.name })), [specialties])
   const roomOptions = useMemo(() => rooms.map((item) => ({ value: item._id, label: `${item.code} - ${item.department?.name || 'N/A'}` })), [rooms])
   const doctorOptions = useMemo(() => doctors.map((item) => ({ value: item._id, label: getDoctorName(item) })), [doctors])
-
-  const resetDoctorForm = () => {
-    setEditingDoctor(null)
-    setDoctorForm(INITIAL_DOCTOR_FORM)
-  }
 
   const resetRoomForm = () => {
     setEditingRoom(null)
@@ -211,30 +155,6 @@ export function AdminOperationsPanel() {
   const resetScheduleForm = () => {
     setEditingSchedule(null)
     setScheduleForm(INITIAL_SCHEDULE_FORM)
-  }
-
-  const handleDoctorSubmit = async (event) => {
-    event.preventDefault()
-    setSaving(true)
-    setError('')
-    setMessage('')
-
-    try {
-      const payload = buildDoctorPayload(doctorForm)
-      if (editingDoctor?._id) {
-        await updateDoctorApi(editingDoctor._id, payload)
-        setMessage('Đã cập nhật bác sĩ.')
-      } else {
-        await createDoctorApi(payload)
-        setMessage('Đã tạo bác sĩ mới.')
-      }
-      resetDoctorForm()
-      await loadData()
-    } catch (requestError) {
-      setError(requestError.response?.data?.message || 'Không thể lưu bác sĩ.')
-    } finally {
-      setSaving(false)
-    }
   }
 
   const handleRoomSubmit = async (event) => {
@@ -291,11 +211,6 @@ export function AdminOperationsPanel() {
     setMessage('')
 
     try {
-      if (type === 'doctor') {
-        await deleteDoctorApi(itemId)
-        if (editingDoctor?._id === itemId) resetDoctorForm()
-        setMessage('Đã xóa bác sĩ.')
-      }
       if (type === 'room') {
         await deleteRoomApi(itemId)
         if (editingRoom?._id === itemId) resetRoomForm()
@@ -317,101 +232,17 @@ export function AdminOperationsPanel() {
   return (
     <section>
       <h1>Điều phối hệ thống</h1>
-      <p>Admin quản lý bác sĩ, phòng, lịch làm việc và chỉ giám sát toàn bộ lịch hẹn.</p>
+      <p>Admin quản lý phòng, lịch làm việc và giám sát toàn bộ lịch hẹn.</p>
 
       {error && <p className="form-error">{error}</p>}
       {message && <p className="muted">{message}</p>}
 
       <div className="actions" style={{ flexWrap: 'wrap', marginBottom: '1rem' }}>
-        <button type="button" onClick={() => setActiveTab('doctors')} disabled={loading || saving} style={activeTab === 'doctors' ? { backgroundColor: '#0f766e', color: '#fff' } : undefined}>Bác sĩ</button>
         <button type="button" onClick={() => setActiveTab('rooms')} disabled={loading || saving} style={activeTab === 'rooms' ? { backgroundColor: '#0f766e', color: '#fff' } : undefined}>Phòng</button>
         <button type="button" onClick={() => setActiveTab('schedules')} disabled={loading || saving} style={activeTab === 'schedules' ? { backgroundColor: '#0f766e', color: '#fff' } : undefined}>Lịch làm việc</button>
         <button type="button" onClick={() => setActiveTab('appointments')} disabled={loading || saving} style={activeTab === 'appointments' ? { backgroundColor: '#0f766e', color: '#fff' } : undefined}>Toàn bộ lịch hẹn</button>
         <button type="button" onClick={loadData} disabled={loading || saving}>{loading ? 'Đang tải...' : 'Làm mới'}</button>
       </div>
-
-      {activeTab === 'doctors' && (
-        <>
-          <div className="panel">
-            <h2>Quản lý bác sĩ</h2>
-            {doctors.length === 0 ? (
-              <p className="muted">Chưa có bác sĩ nào.</p>
-            ) : (
-              <table className="appointments-table">
-                <thead>
-                  <tr>
-                    <th>Bác sĩ</th>
-                    <th>Khoa</th>
-                    <th>Trạng thái</th>
-                    <th>Hành động</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {doctors.map((doctor) => (
-                    <tr key={doctor._id}>
-                      <td>{getDoctorName(doctor)}</td>
-                      <td>{doctor.department?.name || 'N/A'}</td>
-                      <td>{doctor.active ? 'Đang hoạt động' : 'Đã khóa'}</td>
-                      <td>
-                        <div className="actions" style={{ flexDirection: 'column', gap: '0.5rem' }}>
-                          <button type="button" onClick={() => { setEditingDoctor(doctor); setDoctorForm(getDoctorFormState(doctor)); }} disabled={saving}>Chỉnh sửa</button>
-                          <button type="button" onClick={() => handleDelete('doctor', doctor._id)} disabled={saving}>Xóa</button>
-                        </div>
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            )}
-          </div>
-
-          <form className="panel" onSubmit={handleDoctorSubmit}>
-            <h2>{editingDoctor ? 'Cập nhật bác sĩ' : 'Tạo bác sĩ mới'}</h2>
-            <label htmlFor="doctor-user">User bác sĩ</label>
-            <select id="doctor-user" value={doctorForm.user} onChange={(event) => setDoctorForm((current) => ({ ...current, user: event.target.value }))} disabled={saving} required>
-              <option value="">Chọn user bác sĩ</option>
-              {doctorUserOptions.map((option) => <option key={option.value} value={option.value}>{option.label}</option>)}
-            </select>
-            <label htmlFor="doctor-department">Khoa</label>
-            <select id="doctor-department" value={doctorForm.department} onChange={(event) => setDoctorForm((current) => ({ ...current, department: event.target.value }))} disabled={saving}>
-              <option value="">Chọn khoa</option>
-              {departmentOptions.map((option) => <option key={option.value} value={option.value}>{option.label}</option>)}
-            </select>
-            <label htmlFor="doctor-specialties">Chuyên khoa</label>
-            <select
-              id="doctor-specialties"
-              multiple
-              value={doctorForm.specialties}
-              onChange={(event) =>
-                setDoctorForm((current) => ({
-                  ...current,
-                  specialties: Array.from(event.target.selectedOptions, (option) => option.value),
-                }))
-              }
-              disabled={saving}
-            >
-              {specialtyOptions.map((option) => <option key={option.value} value={option.value}>{option.label}</option>)}
-            </select>
-            <label htmlFor="doctor-qualifications">Bằng cấp</label>
-            <input id="doctor-qualifications" value={doctorForm.qualifications} onChange={(event) => setDoctorForm((current) => ({ ...current, qualifications: event.target.value }))} disabled={saving} />
-            <label htmlFor="doctor-experience">Số năm kinh nghiệm</label>
-            <input id="doctor-experience" type="number" value={doctorForm.experienceYears} onChange={(event) => setDoctorForm((current) => ({ ...current, experienceYears: event.target.value }))} disabled={saving} />
-            <label htmlFor="doctor-phone">Điện thoại</label>
-            <input id="doctor-phone" value={doctorForm.phone} onChange={(event) => setDoctorForm((current) => ({ ...current, phone: event.target.value }))} disabled={saving} />
-            <label htmlFor="doctor-bio">Tiểu sử</label>
-            <textarea id="doctor-bio" rows="3" value={doctorForm.bio} onChange={(event) => setDoctorForm((current) => ({ ...current, bio: event.target.value }))} disabled={saving} />
-            <label htmlFor="doctor-active">Trạng thái</label>
-            <select id="doctor-active" value={doctorForm.active ? 'active' : 'inactive'} onChange={(event) => setDoctorForm((current) => ({ ...current, active: event.target.value === 'active' }))} disabled={saving}>
-              <option value="active">Đang hoạt động</option>
-              <option value="inactive">Đã khóa</option>
-            </select>
-            <div className="actions">
-              <button type="submit" disabled={saving}>{saving ? 'Đang lưu...' : editingDoctor ? 'Lưu cập nhật' : 'Tạo bác sĩ'}</button>
-              <button type="button" onClick={resetDoctorForm} disabled={saving}>Bỏ chọn</button>
-            </div>
-          </form>
-        </>
-      )}
 
       {activeTab === 'rooms' && (
         <>

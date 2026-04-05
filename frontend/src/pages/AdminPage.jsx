@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { CatalogManager } from '../features/catalog/CatalogManager'
 import { AdminOperationsPanel } from '../features/admin/AdminOperationsPanel'
 import { UserManagementPanel } from '../features/admin/UserManagementPanel'
+import { AccountCreationPanel } from '../features/admin/AccountCreationPanel'
 import { CATALOG_SCOPE_GROUPS } from '../features/catalog/catalogConfig'
 
 export function AdminPage() {
@@ -29,10 +30,17 @@ export function AdminPage() {
         </button>
         <button
           type="button"
-          onClick={() => setActiveSection('access')}
-          style={activeSection === 'access' ? { backgroundColor: '#0f766e', color: '#fff' } : undefined}
+          onClick={() => setActiveSection('personnel')}
+          style={activeSection === 'personnel' ? { backgroundColor: '#0f766e', color: '#fff' } : undefined}
         >
-          Nhân sự và phân quyền
+          Nhân sự
+        </button>
+        <button
+          type="button"
+          onClick={() => setActiveSection('accounts')}
+          style={activeSection === 'accounts' ? { backgroundColor: '#0f766e', color: '#fff' } : undefined}
+        >
+          Tài khoản
         </button>
       </div>
 
@@ -41,12 +49,13 @@ export function AdminPage() {
           role="admin"
           catalogKeys={CATALOG_SCOPE_GROUPS.admin}
           title="Cấu trúc hệ thống"
-          description="Quản lý bệnh viện, khoa và chuyên khoa của toàn hệ thống."
+          description="Quản lý khoa và chuyên khoa của Bệnh viện Đa Khoa Thủ Đức."
         />
       ) : null}
 
       {activeSection === 'operations' ? <AdminOperationsPanel /> : null}
-      {activeSection === 'access' ? <UserManagementPanel /> : null}
+      {activeSection === 'personnel' ? <UserManagementPanel /> : null}
+      {activeSection === 'accounts' ? <AccountCreationPanel /> : null}
     </section>
   )
 }
