@@ -13,6 +13,7 @@ import { DoctorPage } from '../pages/DoctorPage'
 import { StaffPage } from '../pages/StaffPage'
 import { FileManagerPage } from '../pages/FileManagerPage'
 import { BillingPage } from '../pages/BillingPage'
+import { ChatPage } from '../pages/ChatPage'
 import { UnauthorizedPage } from '../pages/UnauthorizedPage'
 import { NotFoundPage } from '../pages/NotFoundPage'
 
@@ -41,6 +42,10 @@ export function AppRouter() {
 
           <Route element={<RequireRole roles={['staff']} />}>
             <Route path="/nhan-vien" element={<StaffPage />} />
+          </Route>
+
+          <Route element={<RequireRole roles={['patient', 'staff']} />}>
+            <Route path="/tro-chuyen" element={<ChatPage />} />
           </Route>
 
           <Route element={<RequireRole roles={['admin']} />}>

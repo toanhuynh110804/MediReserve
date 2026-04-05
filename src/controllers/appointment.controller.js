@@ -9,16 +9,37 @@ const emitSocketEvent = (req, eventName, payload) => {
   }
 };
 
-exports.create = async (req, res) => {
-  const data = { ...req.body };
-  const session = await mongoose.startSession();
-  let appointmentId;
+const isTransactionUnsupported = (error) => {
+  return typeof error?.message === 'string' && error.message.includes('Transaction numbers are only allowed on a replica set member or mongos');
+};
 
+const withOptionalTransaction = async (work) => {
+  const session = await mongoose.startSession();
   try {
     await session.withTransaction(async () => {
+      await work(session);
+    });
+  } catch (error) {
+    if (!isTransactionUnsupported(error)) {
+      throw error;
+    }
+    await work(null);
+  } finally {
+    session.endSession();
+  }
+};
+
+exports.create = async (req, res) => {
+  const data = { ...req.body };
+  let appointmentId;
+
+  await withOptionalTransaction(async (session) => {
+      const maybeSession = session || undefined;
       if (!data.patient && req.user.role === 'patient') {
         const Patient = require('../models/Patient');
-        const patient = await Patient.findOne({ user: req.user._id }).session(session);
+        let patientQuery = Patient.findOne({ user: req.user._id });
+        if (maybeSession) patientQuery = patientQuery.session(maybeSession);
+        const patient = await patientQuery;
         if (!patient) {
           const err = new Error('Cannot find patient profile');
           err.statusCode = 400;
@@ -27,7 +48,9 @@ exports.create = async (req, res) => {
         data.patient = patient._id;
       }
 
-      const schedule = await Schedule.findById(data.schedule).session(session);
+      let scheduleQuery = Schedule.findById(data.schedule);
+      if (maybeSession) scheduleQuery = scheduleQuery.session(maybeSession);
+      const schedule = await scheduleQuery;
       if (!schedule || schedule.status !== 'open') {
         const err = new Error('Schedule không hợp lệ');
         err.statusCode = 400;
@@ -40,16 +63,13 @@ exports.create = async (req, res) => {
       }
 
       const appointment = new Appointment(data);
-      await appointment.save({ session });
+      await appointment.save(maybeSession ? { session: maybeSession } : undefined);
       appointmentId = appointment._id;
 
       schedule.bookedCount += 1;
       if (schedule.bookedCount >= schedule.capacity) schedule.status = 'closed';
-      await schedule.save({ session });
+      await schedule.save(maybeSession ? { session: maybeSession } : undefined);
     });
-  } finally {
-    session.endSession();
-  }
 
   const appointment = await Appointment.findById(appointmentId).populate('patient doctor schedule room');
   emitSocketEvent(req, 'appointment:created', { appointmentId: appointment._id });
@@ -90,10 +110,11 @@ exports.updateById = async (req, res) => {
 };
 
 exports.cancel = async (req, res) => {
-  const session = await mongoose.startSession();
-  try {
-    await session.withTransaction(async () => {
-      const appointment = await Appointment.findById(req.params.id).session(session);
+  await withOptionalTransaction(async (session) => {
+      const maybeSession = session || undefined;
+      let appointmentQuery = Appointment.findById(req.params.id);
+      if (maybeSession) appointmentQuery = appointmentQuery.session(maybeSession);
+      const appointment = await appointmentQuery;
       if (!appointment) {
         const err = new Error('Appointment không tồn tại');
         err.statusCode = 404;
@@ -103,23 +124,22 @@ exports.cancel = async (req, res) => {
       if (appointment.status !== 'cancelled') {
         appointment.status = 'cancelled';
         appointment.cancelReason = req.body.cancelReason || 'Hủy bởi người dùng';
-        await appointment.save({ session });
+        await appointment.save(maybeSession ? { session: maybeSession } : undefined);
 
         if (appointment.schedule) {
-          const schedule = await Schedule.findById(appointment.schedule).session(session);
+          let scheduleQuery = Schedule.findById(appointment.schedule);
+          if (maybeSession) scheduleQuery = scheduleQuery.session(maybeSession);
+          const schedule = await scheduleQuery;
           if (schedule) {
             schedule.bookedCount = Math.max(0, (schedule.bookedCount || 0) - 1);
             if (schedule.status === 'closed' && schedule.bookedCount < schedule.capacity) {
               schedule.status = 'open';
             }
-            await schedule.save({ session });
+            await schedule.save(maybeSession ? { session: maybeSession } : undefined);
           }
         }
       }
     });
-  } finally {
-    session.endSession();
-  }
 
   const appointment = await Appointment.findById(req.params.id).populate('patient doctor schedule room');
   emitSocketEvent(req, 'appointment:cancelled', { appointmentId: appointment._id });
