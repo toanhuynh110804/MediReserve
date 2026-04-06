@@ -20,25 +20,23 @@ vi.mock('../../shared/api/staffWorkspaceApi', () => ({
   createStaffAppointmentApi: vi.fn().mockResolvedValue({ _id: 'a2' }),
   markAppointmentArrivedApi: vi.fn().mockResolvedValue({ _id: 'a1' }),
   cancelStaffAppointmentApi: vi.fn().mockResolvedValue({ _id: 'a1' }),
-  createPatientApi: vi.fn().mockResolvedValue({ _id: 'p2' }),
-  updatePatientApi: vi.fn().mockResolvedValue({ _id: 'p1' }),
 }))
 
 describe('StaffOperationsPanel', () => {
-  it('renders patient intake data', async () => {
+  it('renders appointment management workspace', async () => {
     render(<StaffOperationsPanel />)
 
-    expect(await screen.findByText('BN A')).toBeInTheDocument()
-    expect(screen.getByLabelText('Tìm kiếm bệnh nhân')).toHaveValue('')
+    expect(await screen.findByRole('heading', { name: 'Tạo lịch khám cho bệnh nhân' })).toBeInTheDocument()
+    expect(screen.getByText('Khu vực nhân viên hành chính')).toBeInTheDocument()
   })
 
-  it('switches to appointments tab', async () => {
+  it('shows appointment actions without patient profile form', async () => {
     render(<StaffOperationsPanel />)
 
-    await screen.findByText('BN A')
-    fireEvent.click(screen.getByRole('button', { name: 'Lịch khám' }))
+    await screen.findByRole('heading', { name: 'Danh sách lịch khám' })
 
-    expect(await screen.findByText('Nhân viên là người tạo lịch khám thủ công cho bệnh nhân tại quầy tiếp nhận.')).toBeInTheDocument()
+    expect(screen.getByText('Nhân viên chỉ dùng khu vực này để xử lý lịch khám cho bệnh nhân đã có tài khoản/hồ sơ nền trong hệ thống.')).toBeInTheDocument()
     expect(screen.getByRole('button', { name: 'Đã đến' })).toBeInTheDocument()
+    expect(screen.queryByText('Tạo hồ sơ bệnh nhân')).not.toBeInTheDocument()
   })
 })

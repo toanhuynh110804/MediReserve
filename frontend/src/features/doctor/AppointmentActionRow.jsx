@@ -52,6 +52,7 @@ export function AppointmentActionRow({
     <tr style={isSelected ? { backgroundColor: '#f5f9ff' } : undefined}>
       <td>{appointment._id?.slice(-8)}</td>
       <td>{getAppointmentPatientLabel(appointment)}</td>
+      <td>{appointment.department?.name || appointment.schedule?.department?.name || 'N/A'}</td>
       <td>{formatDate(appointment.date)}</td>
       <td>
         <span style={{ color: status.color, fontWeight: 'bold' }}>

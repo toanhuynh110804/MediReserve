@@ -11,7 +11,7 @@
   - Admin/Staff: quan ly danh muc (hospital, department, specialty, medicine, insurance), quan ly user/staff, xem bao cao co ban.
 
 ## 2. Hien trang backend (co so de tich hop)
-- Backend da co API REST cho cac module chinh: auth, users, roles, hospitals, departments, doctors, patients, schedules, appointments, medical-records, prescriptions, invoices, payments, reviews, ratings, tests, test-results, notifications, files, staff, addresses, medicines, insurances.
+- Backend da co API REST cho cac module chinh: auth, users, roles, hospitals, departments, doctors, patients, schedules, appointments, medical-records, prescriptions, reviews, ratings, tests, test-results, notifications, files, staff, addresses, medicines, insurances.
 - Auth su dung JWT Bearer token.
 - Middleware validation Joi da san sang.
 - Swagger/OpenAPI da mount, co the dung lam hop dong API khi frontend tich hop.
@@ -122,9 +122,6 @@ frontend/
   - Users: /api/users
   - Staff: /api/staff
   - Roles: /api/roles
-- Quan ly tai chinh co ban:
-  - Invoice: /api/invoices
-  - Payment: /api/payments
 
 ## 5.6 Realtime mapping (Socket)
 - Ket noi socket sau khi login thanh cong.
@@ -170,7 +167,6 @@ frontend/
 ## Giai doan 5 - Admin/Staff flow (3-4 ngay)
 - CRUD danh muc he thong.
 - CRUD staff/users/roles (theo quyen).
-- Invoice/payment view co ban.
 
 ## Giai doan 6 - Hoan thien chat luong (2-3 ngay)
 - Skeleton/loading/empty/error states.
@@ -291,8 +287,7 @@ Muc tieu phan nay: Trien khai frontend theo cach chia nho, xong tung chuc nang r
 9. Medical records + prescriptions.
 10. Admin/Staff catalog modules: hospitals, departments, specialties, medicines, insurances.
 11. Staff/users/roles management.
-12. Invoice/payment views.
-13. Hoan thien UX, test E2E, toi uu hieu nang.
+12. Hoan thien UX, test E2E, toi uu hieu nang.
 
 ### 15.3 Quy trinh 7 buoc cho moi chuc nang
 1. Xac nhan pham vi nho cua chuc nang:
@@ -445,36 +440,6 @@ Muc tieu phan nay: Trien khai frontend theo cach chia nho, xong tung chuc nang r
   - npm run test: PASS (13/13 tests)
   - npm run build: PASS
 
-### Chuc nang #12 - Invoice/Payment views
-- Trang thai: DONE
-- Pham vi hoan tat:
-  - Xem danh sach hoa don cua benh nhan (GET /api/invoices?patient=userId).
-  - Xem danh sach thanh toan cua benh nhan (GET /api/payments?patient=userId).
-  - Tab interface: chuyen giua "Hoa don" va "Thanh toan".
-  - Hien thi chi tiet: so tien, ngay tao, trang thai (mau sac theo trang thai).
-  - Format tien te VND, dinh dang ngay gio Vietnam.
-  - Route: /thanh-toan (accessible cho all authenticated roles).
-  - Menu: them link "Thanh toan" cho tat ca user dang nhap.
-  - Upload file: thanh toán là view-only (không edit, không tạo mới từ frontend).
-- File chinh da tao/cap nhat:
-  - frontend/src/shared/api/invoiceApi.js
-  - frontend/src/shared/api/invoiceApi.test.js
-  - frontend/src/shared/api/paymentApi.js
-  - frontend/src/shared/api/paymentApi.test.js
-  - frontend/src/features/billing/billingHelpers.js
-  - frontend/src/features/billing/InvoiceCard.jsx
-  - frontend/src/features/billing/InvoiceCard.test.jsx
-  - frontend/src/features/billing/PaymentRow.jsx
-  - frontend/src/features/billing/PaymentRow.test.jsx
-  - frontend/src/pages/BillingPage.jsx
-  - frontend/src/app/AppRouter.jsx (route /thanh-toan)
-  - frontend/src/layouts/navItems.js (them link)
-  - frontend/src/layouts/navItems.test.js (cap nhat test)
-- Ket qua test:
-  - npm run lint: PASS
-  - npm run test: PASS (49/49 tests)
-  - npm run build: PASS
-
 ### Chuc nang #6 - Realtime socket integration
 - Trang thai: DONE
 - Pham vi hoan tat:
@@ -514,36 +479,6 @@ Muc tieu phan nay: Trien khai frontend theo cach chia nho, xong tung chuc nang r
 - Ket qua test:
   - npm run lint: PASS
   - npm run test: PASS (30/30 tests)
-  - npm run build: PASS
-
-### Chuc nang #12 - Invoice/Payment views
-- Trang thai: DONE
-- Pham vi hoan tat:
-  - Xem danh sach hoa don cua benh nhan (GET /api/invoices?patient=userId).
-  - Xem danh sach thanh toan cua benh nhan (GET /api/payments?patient=userId).
-  - Tab interface: chuyen giua "Hoa don" va "Thanh toan".
-  - Hien thi chi tiet: so tien, ngay tao, trang thai (mau sac theo trang thai).
-  - Format tien te VND, dinh dang ngay gio Vietnam.
-  - Route: /thanh-toan (accessible cho all authenticated roles).
-  - Menu: them link "Thanh toan" cho tat ca user dang nhap.
-  - Upload file: thanh toán là view-only (không edit, không tạo mới từ frontend).
-- File chinh da tao/cap nhat:
-  - frontend/src/shared/api/invoiceApi.js
-  - frontend/src/shared/api/invoiceApi.test.js
-  - frontend/src/shared/api/paymentApi.js
-  - frontend/src/shared/api/paymentApi.test.js
-  - frontend/src/features/billing/billingHelpers.js
-  - frontend/src/features/billing/InvoiceCard.jsx
-  - frontend/src/features/billing/InvoiceCard.test.jsx
-  - frontend/src/features/billing/PaymentRow.jsx
-  - frontend/src/features/billing/PaymentRow.test.jsx
-  - frontend/src/pages/BillingPage.jsx
-  - frontend/src/app/AppRouter.jsx (route /thanh-toan)
-  - frontend/src/layouts/navItems.js (them link)
-  - frontend/src/layouts/navItems.test.js (cap nhat test)
-- Ket qua test:
-  - npm run lint: PASS
-  - npm run test: PASS (49/49 tests)
   - npm run build: PASS
 
 ### Chuc nang #8 - Doctor workspace
@@ -668,7 +603,7 @@ Muc tieu phan nay: Trien khai frontend theo cach chia nho, xong tung chuc nang r
 - Pham vi hoan tat:
   - Nang cap shell giao dien voi skip-link, footer thong tin ky thuat, session panel ro rang hon.
   - Bo sung `PageHero` va `StateNotice` de thong nhat hero, empty/loading/error feedback tren cac trang chinh.
-  - Cai tien HomePage, DashboardPage, BillingPage, FileManagerPage theo huong ro thong tin hon va than thien mobile hon.
+  - Cai tien HomePage, DashboardPage, FileManagerPage theo huong ro thong tin hon va than thien mobile hon.
   - Thay alert blocking tren Dashboard bang trang thai inline co the theo doi lai.
   - Bo sung style cho tabs, tables, textarea, focus state, stat cards va panel grid.
   - Thiet lap Playwright (`playwright.config.js`, script `test:e2e`, `test:e2e:ui`).
@@ -683,7 +618,6 @@ Muc tieu phan nay: Trien khai frontend theo cach chia nho, xong tung chuc nang r
   - frontend/src/layouts/AppShell.jsx
   - frontend/src/pages/HomePage.jsx
   - frontend/src/pages/DashboardPage.jsx
-  - frontend/src/pages/BillingPage.jsx
   - frontend/src/pages/FileManagerPage.jsx
   - frontend/src/index.css
   - frontend/vite.config.js

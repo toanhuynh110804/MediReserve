@@ -1,11 +1,9 @@
 import { describe, expect, it, vi } from 'vitest'
 import {
   cancelStaffAppointmentApi,
-  createPatientApi,
   createStaffAppointmentApi,
   getStaffAppointmentsApi,
   markAppointmentArrivedApi,
-  updatePatientApi,
 } from './staffWorkspaceApi'
 import { httpClient } from './httpClient'
 
@@ -25,15 +23,13 @@ describe('staffWorkspaceApi', () => {
   })
 
   it('creates and updates staff-managed records', async () => {
-    const payload = { user: 'u1' }
+    const payload = { ok: true }
     httpClient.post.mockResolvedValue({ data: payload })
     httpClient.put.mockResolvedValue({ data: payload })
 
     await createStaffAppointmentApi({ _id: 'schedule-1' }, 'patient-1', 'note')
     await markAppointmentArrivedApi('a1')
     await cancelStaffAppointmentApi('a1', 'cancel')
-    await createPatientApi(payload)
-    await updatePatientApi('p1', payload)
 
     expect(httpClient.post).toHaveBeenCalledWith('/api/appointments', {
       schedule: 'schedule-1',
@@ -42,7 +38,5 @@ describe('staffWorkspaceApi', () => {
     })
     expect(httpClient.put).toHaveBeenCalledWith('/api/appointments/a1', { status: 'confirmed' })
     expect(httpClient.post).toHaveBeenCalledWith('/api/appointments/a1/cancel', { cancelReason: 'cancel' })
-    expect(httpClient.post).toHaveBeenCalledWith('/api/patients', payload)
-    expect(httpClient.put).toHaveBeenCalledWith('/api/patients/p1', payload)
   })
 })

@@ -2,6 +2,46 @@ const mongoose = require('mongoose');
 const Appointment = require('../models/Appointment');
 const Schedule = require('../models/Schedule');
 
+const appointmentPopulate = [
+  {
+    path: 'patient',
+    populate: { path: 'user' },
+  },
+  {
+    path: 'doctor',
+    populate: { path: 'user' },
+  },
+  'department',
+  'schedule',
+  'room',
+];
+
+const normalizeDetailsList = (items = []) =>
+  items
+    .filter(Boolean)
+    .map((item) => String(item).trim())
+    .filter(Boolean);
+
+const normalizePatientDetails = (details = {}, fallbackUser = null) => ({
+  fullName: details.fullName || fallbackUser?.name || '',
+  email: details.email || fallbackUser?.email || '',
+  phone: details.phone || fallbackUser?.phone || '',
+  dateOfBirth: details.dateOfBirth || undefined,
+  gender: details.gender || '',
+  bloodType: details.bloodType || '',
+  address: details.address || '',
+  symptoms: normalizeDetailsList(details.symptoms),
+  medicalHistory: normalizeDetailsList(details.medicalHistory),
+  allergies: normalizeDetailsList(details.allergies),
+  reasonForVisit: details.reasonForVisit || '',
+  insurance: {
+    provider: details.insurance?.provider || '',
+    policyNumber: details.insurance?.policyNumber || '',
+    coverage: details.insurance?.coverage || '',
+    validUntil: details.insurance?.validUntil || undefined,
+  },
+});
+
 const emitSocketEvent = (req, eventName, payload) => {
   const io = req.app.get('io');
   if (io) {
@@ -18,13 +58,51 @@ exports.create = async (req, res) => {
     await session.withTransaction(async () => {
       if (!data.patient && req.user.role === 'patient') {
         const Patient = require('../models/Patient');
-        const patient = await Patient.findOne({ user: req.user._id }).session(session);
+        const patient = await Patient.findOne({ user: req.user._id }).populate('user').session(session);
         if (!patient) {
           const err = new Error('Cannot find patient profile');
           err.statusCode = 400;
           throw err;
         }
+        if (!data.patientDetails) {
+          const err = new Error('Thiếu thông tin chi tiết bệnh nhân cho lịch hẹn');
+          err.statusCode = 400;
+          throw err;
+        }
         data.patient = patient._id;
+
+        const patientDetails = normalizePatientDetails(data.patientDetails, patient.user);
+        data.patientDetails = patientDetails;
+
+        patient.dateOfBirth = patientDetails.dateOfBirth || patient.dateOfBirth;
+        patient.gender = patientDetails.gender || patient.gender;
+        patient.bloodType = patientDetails.bloodType || patient.bloodType;
+        patient.medicalHistory = patientDetails.medicalHistory;
+        patient.allergies = patientDetails.allergies;
+        patient.insurance = {
+          ...patient.insurance?.toObject?.(),
+          provider: patientDetails.insurance.provider,
+          policyNumber: patientDetails.insurance.policyNumber,
+          coverage: patientDetails.insurance.coverage,
+          validUntil: patientDetails.insurance.validUntil || undefined,
+        };
+
+        if (patient.user) {
+          patient.user.name = patientDetails.fullName || patient.user.name;
+          patient.user.email = patientDetails.email || patient.user.email;
+          patient.user.phone = patientDetails.phone || patient.user.phone;
+          if (patientDetails.address) {
+            patient.user.address = {
+              ...(patient.user.address?.toObject?.() || patient.user.address || {}),
+              street: patientDetails.address,
+            };
+          }
+          await patient.user.save({ session });
+        }
+
+        await patient.save({ session });
+      } else if (data.patientDetails) {
+        data.patientDetails = normalizePatientDetails(data.patientDetails);
       }
 
       const schedule = await Schedule.findById(data.schedule).session(session);
@@ -39,6 +117,9 @@ exports.create = async (req, res) => {
         throw err;
       }
 
+      const departmentId = schedule.department || data.department;
+      data.department = departmentId;
+
       const appointment = new Appointment(data);
       await appointment.save({ session });
       appointmentId = appointment._id;
@@ -51,7 +132,7 @@ exports.create = async (req, res) => {
     session.endSession();
   }
 
-  const appointment = await Appointment.findById(appointmentId).populate('patient doctor schedule room');
+  const appointment = await Appointment.findById(appointmentId).populate(appointmentPopulate);
   emitSocketEvent(req, 'appointment:created', { appointmentId: appointment._id });
 
   res.status(201).json(appointment);
@@ -72,19 +153,25 @@ exports.getAll = async (req, res) => {
     query.doctor = doctor._id;
   }
   if (req.query.status) query.status = req.query.status;
+  if (req.query.department) query.department = req.query.department;
 
-  const appointments = await Appointment.find(query).populate('patient doctor schedule room');
+  const appointments = await Appointment.find(query).populate(appointmentPopulate);
   res.json(appointments);
 };
 
 exports.getById = async (req, res) => {
-  const appointment = await Appointment.findById(req.params.id).populate('patient doctor schedule room');
+  const appointment = await Appointment.findById(req.params.id).populate(appointmentPopulate);
   if (!appointment) return res.status(404).json({ message: 'Appointment không tồn tại' });
   res.json(appointment);
 };
 
 exports.updateById = async (req, res) => {
-  const appointment = await Appointment.findByIdAndUpdate(req.params.id, req.body, { new: true }).populate('patient doctor schedule room');
+  const updateData = { ...req.body };
+  if (updateData.patientDetails) {
+    updateData.patientDetails = normalizePatientDetails(updateData.patientDetails);
+  }
+
+  const appointment = await Appointment.findByIdAndUpdate(req.params.id, updateData, { new: true }).populate(appointmentPopulate);
   if (!appointment) return res.status(404).json({ message: 'Appointment không tồn tại' });
   res.json(appointment);
 };
@@ -121,7 +208,7 @@ exports.cancel = async (req, res) => {
     session.endSession();
   }
 
-  const appointment = await Appointment.findById(req.params.id).populate('patient doctor schedule room');
+  const appointment = await Appointment.findById(req.params.id).populate(appointmentPopulate);
   emitSocketEvent(req, 'appointment:cancelled', { appointmentId: appointment._id });
   res.json(appointment);
 };

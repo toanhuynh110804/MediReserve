@@ -41,21 +41,54 @@ describe('transactionSync helpers', () => {
   })
 
   it('fetches unified snapshot for schedules/doctors/appointments', async () => {
-    const getSchedules = vi.fn().mockResolvedValue([{ _id: 's1', status: 'open' }])
+    const getSchedules = vi
+      .fn()
+      .mockResolvedValueOnce([{ _id: 's1', status: 'open', date: '2026-04-02T00:00:00.000Z' }])
+      .mockResolvedValueOnce([
+        { _id: 's1', status: 'open', date: '2026-04-02T00:00:00.000Z' },
+        { _id: 's2', status: 'open', date: '2026-04-05T00:00:00.000Z' },
+      ])
     const getDoctors = vi.fn().mockResolvedValue([{ _id: 'd1' }])
     const getAppointments = vi.fn().mockResolvedValue([{ _id: 'a1' }])
 
     const result = await fetchPatientBookingSnapshot({
       dateFilter: '2026-04-02',
+      departmentFilter: 'dep-1',
       getSchedules,
       getDoctors,
       getAppointments,
     })
 
-    expect(getSchedules).toHaveBeenCalledWith({ date: '2026-04-02' })
+    expect(getSchedules).toHaveBeenNthCalledWith(1, { date: '2026-04-02', department: 'dep-1' })
+    expect(getSchedules).toHaveBeenNthCalledWith(2, { department: 'dep-1' })
     expect(result.openSchedules).toHaveLength(1)
     expect(result.doctors).toHaveLength(1)
     expect(result.appointments).toHaveLength(1)
+    expect(result.availability).toMatchObject({
+      hasAnyAvailableDoctor: true,
+      hasAvailabilityOnSelectedDate: true,
+      availableDateKeys: ['2026-04-02', '2026-04-05'],
+    })
     expect(typeof result.fetchedAt).toBe('number')
+  })
+
+  it('returns unavailable status when department has no open schedules', async () => {
+    const getSchedules = vi.fn().mockResolvedValueOnce([]).mockResolvedValueOnce([])
+    const getDoctors = vi.fn().mockResolvedValue([])
+    const getAppointments = vi.fn().mockResolvedValue([])
+
+    const result = await fetchPatientBookingSnapshot({
+      dateFilter: '2026-04-02',
+      departmentFilter: 'dep-2',
+      getSchedules,
+      getDoctors,
+      getAppointments,
+    })
+
+    expect(result.availability).toMatchObject({
+      hasAnyAvailableDoctor: false,
+      hasAvailabilityOnSelectedDate: false,
+      availableDateKeys: [],
+    })
   })
 })

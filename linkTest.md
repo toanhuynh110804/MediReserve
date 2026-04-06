@@ -381,14 +381,13 @@ Nếu role là **patient**, có thể **bỏ** `patient` trong body — server t
 ```json
 {
   "status": "confirmed",
-  "paymentStatus": "unpaid",
   "notes": "Da xac nhan"
 }
 ```
 
 ---
 
-### 2.11 Medical records, Prescriptions, Invoices, Payments
+### 2.11 Medical records, Prescriptions
 
 **Medical records** `/api/medical-records` — GET: admin, doctor, staff, patient | POST: doctor, admin, staff  
 
@@ -426,45 +425,6 @@ Nếu role là **patient**, có thể **bỏ** `patient` trong body — server t
   "status": "active"
 }
 ```
-
-**Invoices** `/api/invoices` — POST: admin, staff  
-
-**POST body mẫu:**
-
-```json
-{
-  "appointment": "507f1f77bcf86cd799439011",
-  "patient": "507f1f77bcf86cd799439012",
-  "doctor": "507f1f77bcf86cd799439013",
-  "items": [
-    { "title": "Kham benh", "amount": 200000 },
-    { "title": "Xet nghiem", "amount": 150000 }
-  ],
-  "subTotal": 350000,
-  "tax": 35000,
-  "discount": 0,
-  "total": 385000,
-  "status": "unpaid"
-}
-```
-
-**Payments** `/api/payments` — POST: admin, staff  
-
-**POST body mẫu:**
-
-```json
-{
-  "invoice": "507f1f77bcf86cd799439011",
-  "appointment": "507f1f77bcf86cd799439012",
-  "patient": "507f1f77bcf86cd799439013",
-  "method": "cash",
-  "amount": 385000,
-  "status": "completed",
-  "transactionId": "TXN-2026-001"
-}
-```
-
----
 
 ### 2.12 Reviews, Ratings
 

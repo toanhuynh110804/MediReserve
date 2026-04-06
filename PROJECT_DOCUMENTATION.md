@@ -205,12 +205,6 @@ Room:
 - `cancelled` - Bị hủy
 - `no-show` - Không xuất hiện
 
-**Payment Status:**
-- `unpaid` - Chưa thanh toán
-- `paid` - Đã thanh toán
-- `partial` - Thanh toán từng phần
-- `refunded` - Hoàn tiền
-
 **Endpoints:**
 ```
 POST   /api/appointments           - Đặt lịch hẹn
@@ -293,58 +287,7 @@ Medicine:
 
 ---
 
-### ✅ 7. Thanh Toán & Hóa Đơn (Payment & Billing System)
-
-#### 7.1 Hóa Đơn (Invoice)
-**Files:** `src/models/Invoice.js`, `src/controllers/invoice.controller.js`
-
-```javascript
-Invoice:
-  - appointment (ref, optional)
-  - patient (ref)
-  - doctor (ref)
-  - items: [
-      {
-        title: "Không thăm khám",
-        amount: 200000
-      }
-    ]
-  - subTotal
-  - tax (10%)
-  - discount
-  - total
-  - status: 'unpaid' | 'paid' | 'partial' | 'refunded'
-```
-
-#### 7.2 Thanh Toán (Payment)
-**Files:** `src/models/Payment.js`, `src/controllers/payment.controller.js`
-
-```javascript
-Payment:
-  - invoice (ref)
-  - appointment (ref)
-  - patient (ref)
-  - method: 'cash' | 'card' | 'insurance' | 'online'
-  - amount
-  - status: 'pending' | 'completed' | 'failed' | 'refunded'
-  - transactionId (từ payment gateway)
-```
-
-**Endpoints:**
-```
-POST   /api/invoices               - Tạo hóa đơn
-GET    /api/invoices               - Xem danh sách
-GET    /api/invoices/:id           - Chi tiết
-PUT    /api/invoices/:id           - Cập nhật
-
-POST   /api/payments               - Thanh toán
-GET    /api/payments               - Xem lịch sử thanh toán
-GET    /api/payments/:id           - Chi tiết thanh toán
-```
-
----
-
-### ✅ 8. Đánh Giá & Xếp Hạng (Reviews & Ratings)
+### ✅ 7. Đánh Giá & Xếp Hạng (Reviews & Ratings)
 
 **Files liên quan:**
 - `src/models/Review.js`
@@ -447,8 +390,6 @@ Notification:
 | `/api/appointments` | Đặt & quản lý lịch hẹn |
 | `/api/medical-records` | Hồ sơ y tế |
 | `/api/prescriptions` | Đơn thuốc |
-| `/api/invoices` | Hóa đơn |
-| `/api/payments` | Thanh toán |
 | `/api/reviews` | Đánh giá |
 | `/api/ratings` | Xếp hạng |
 | `/api/tests` | Xét nghiệm |
@@ -517,16 +458,11 @@ errorMiddleware(err, req, res, next)
    Doctor → Create Prescription with Medicines →
    Doctor → Order Tests
 
-6. BILLING
-   System → Create Invoice (from appointment items) →
-   Patient → View Invoice →
-   Patient → Make Payment (cash/card/insurance/online)
-
-7. FEEDBACK
+6. FEEDBACK
    Patient → Submit Review & Rating →
    Doctor.rating ↑ (aggregate)
 
-8. NOTIFICATIONS
+7. NOTIFICATIONS
    System → Send Notifications to relevant users
 ```
 
@@ -589,7 +525,6 @@ NODE_ENV=development
 - [x] Hồ sơ y tế (Medical Record)
 - [x] Đơn thuốc (Prescription)
 - [x] Xét nghiệm (Test, TestResult)
-- [x] Thanh toán & Hóa đơn (Payment, Invoice)
 - [x] Đánh giá & Xếp hạng (Review, Rating)
 - [x] Thông báo (Notification)
 - [x] CRUD cho tất cả entities
@@ -609,7 +544,6 @@ NODE_ENV=development
 - [x] Frontend chức năng #5: Đồng bộ transaction UI sau mutation (đồng bộ lại từ backend, chống lệch trạng thái)
 - [x] Frontend chức năng #6: Realtime socket cho patient appointment (event chỉ trigger đồng bộ lại từ backend)
 - [x] Frontend chức năng #7: File upload multipart (tải, xem danh sách, xóa file)
-- [x] Frontend chức năng #12: Invoice/Payment views (xem hóa đơn + thanh toán lịch sử)
 - [x] Sửa lỗi backend được phát hiện qua smoke test:
   - [x] `review.controller.js`: map đúng `Patient._id` thay vì `User._id`
   - [x] `rating.controller.js`: map đúng `Patient._id` cho user role `patient`
@@ -621,7 +555,6 @@ NODE_ENV=development
 - [ ] Integration Tests
 - [ ] Hoàn thiện Joi cho các route còn lại (đã có middleware + auth + appointments)
 - [ ] Email notifications
-- [ ] Payment gateway integration
 - [ ] Database indexing optimization
 - [ ] Logging system
 - [ ] Rate limiting
@@ -754,8 +687,6 @@ GET / → { success: true, message: 'MediReserve API is running' }
 5. **Realtime đã bật**: Hệ thống có socket event cho thay đổi lịch hẹn (`appointment:created`, `appointment:cancelled`).
 
 6. **Email chưa được setup**: Nên thêm email notifications cho các sự kiện quan trọng
-
-7. **Payment integration**: Hiện tại chỉ lưu trữ payment info, chưa tích hợp payment gateway thực
 
 ---
 

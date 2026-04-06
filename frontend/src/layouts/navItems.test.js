@@ -12,9 +12,9 @@ describe('buildNavItems', () => {
     expect(items.map((item) => item.to)).toEqual(['/', '/quan-tri', '/quan-ly-tep'])
   })
 
-  it('shows patient workspace and billing for patient users', () => {
+  it('shows only patient workspace for patient users', () => {
     const items = buildNavItems(true, 'patient')
-    expect(items.map((item) => item.to)).toEqual(['/', '/benh-nhan', '/thanh-toan'])
+    expect(items.map((item) => item.to)).toEqual(['/', '/benh-nhan'])
   })
 
   it('shows only doctor workspace and attachments for doctor users', () => {

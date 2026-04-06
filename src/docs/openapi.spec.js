@@ -154,20 +154,6 @@ const paths = {
   '/api/prescriptions/{id}': {
     ...crudId('Prescriptions', 'đơn thuốc'),
   },
-  '/api/invoices': {
-    get: op('Danh sách hóa đơn', 'Invoices'),
-    post: op201('Tạo hóa đơn (admin, staff)', 'Invoices'),
-  },
-  '/api/invoices/{id}': {
-    ...crudId('Invoices', 'hóa đơn'),
-  },
-  '/api/payments': {
-    get: op('Danh sách thanh toán', 'Payments'),
-    post: op201('Tạo thanh toán (admin, staff)', 'Payments'),
-  },
-  '/api/payments/{id}': {
-    ...crudId('Payments', 'thanh toán'),
-  },
   '/api/reviews': {
     get: op('Danh sách đánh giá', 'Reviews'),
     post: op201('Tạo đánh giá (patient, admin, staff)', 'Reviews'),
@@ -269,8 +255,6 @@ module.exports = {
     { name: 'Appointments', description: 'Lịch hẹn' },
     { name: 'Medical records', description: 'Hồ sơ y tế' },
     { name: 'Prescriptions', description: 'Đơn thuốc' },
-    { name: 'Invoices', description: 'Hóa đơn' },
-    { name: 'Payments', description: 'Thanh toán' },
     { name: 'Reviews', description: 'Đánh giá' },
     { name: 'Ratings', description: 'Xếp hạng' },
     { name: 'Tests', description: 'Danh mục xét nghiệm' },

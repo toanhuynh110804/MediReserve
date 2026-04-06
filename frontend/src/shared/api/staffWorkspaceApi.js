@@ -24,13 +24,3 @@ export async function cancelStaffAppointmentApi(appointmentId, cancelReason = ''
   const response = await httpClient.post(`/api/appointments/${appointmentId}/cancel`, { cancelReason })
   return response.data
 }
-
-export async function createPatientApi(data) {
-  const response = await httpClient.post('/api/patients', data)
-  return response.data
-}
-
-export async function updatePatientApi(patientId, data) {
-  const response = await httpClient.put(`/api/patients/${patientId}`, data)
-  return response.data
-}

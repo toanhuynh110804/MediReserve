@@ -10,7 +10,7 @@ export function renderAppointmentStatus(status) {
 }
 
 export function getAppointmentPatientLabel(appointment) {
-  const explicitName = appointment?.patient?.user?.name || appointment?.patient?.name
+  const explicitName = appointment?.patientDetails?.fullName || appointment?.patient?.user?.name || appointment?.patient?.name
   if (explicitName) {
     return explicitName
   }

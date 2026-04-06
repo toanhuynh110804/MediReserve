@@ -16,8 +16,8 @@ export async function getMyAppointmentsApi() {
   return data
 }
 
-export async function createAppointmentFromScheduleApi(schedule, notes = '') {
-  const payload = buildAppointmentPayload(schedule, notes)
+export async function createAppointmentFromScheduleApi(schedule, notes = '', patientDetails = {}, bookingOptions = {}) {
+  const payload = buildAppointmentPayload(schedule, notes, patientDetails, bookingOptions)
   const { data } = await httpClient.post('/api/appointments', payload)
   return data
 }

@@ -29,6 +29,14 @@ import {
 import { MedicalRecordForm } from '../features/doctor/MedicalRecordForm'
 import { PrescriptionForm } from '../features/doctor/PrescriptionForm'
 
+function renderList(items) {
+  if (!Array.isArray(items) || items.length === 0) {
+    return 'Chưa cập nhật'
+  }
+
+  return items.join(', ')
+}
+
 export function DoctorPage() {
   const { user } = useAuth()
   const [doctorProfile, setDoctorProfile] = useState(null)
@@ -288,6 +296,7 @@ export function DoctorPage() {
               <tr>
                 <th>ID lịch hẹn</th>
                 <th>Bệnh nhân</th>
+                <th>Khoa</th>
                 <th>Ngày giờ</th>
                 <th>Trạng thái</th>
                 <th>Hành động</th>
@@ -329,8 +338,26 @@ export function DoctorPage() {
               <strong>Bệnh nhân:</strong> {getPatientDisplayName(selectedAppointment)}
             </p>
             <p>
+              <strong>Khoa tiếp nhận:</strong> {selectedAppointment.department?.name || selectedAppointment.schedule?.department?.name || 'Chưa cập nhật'}
+            </p>
+            <p>
               <strong>Trạng thái:</strong> {selectedAppointment.status}
             </p>
+            {selectedAppointment.patientDetails ? (
+              <div className="status-box" style={{ marginTop: '1rem' }}>
+                <p><strong>Số điện thoại:</strong> {selectedAppointment.patientDetails.phone || 'Chưa cập nhật'}</p>
+                <p><strong>Email:</strong> {selectedAppointment.patientDetails.email || 'Chưa cập nhật'}</p>
+                <p><strong>Ngày sinh:</strong> {selectedAppointment.patientDetails.dateOfBirth ? new Date(selectedAppointment.patientDetails.dateOfBirth).toLocaleDateString('vi-VN') : 'Chưa cập nhật'}</p>
+                <p><strong>Giới tính:</strong> {selectedAppointment.patientDetails.gender || 'Chưa cập nhật'}</p>
+                <p><strong>Nhóm máu:</strong> {selectedAppointment.patientDetails.bloodType || 'Chưa cập nhật'}</p>
+                <p><strong>Địa chỉ:</strong> {selectedAppointment.patientDetails.address || 'Chưa cập nhật'}</p>
+                <p><strong>Lý do khám:</strong> {selectedAppointment.patientDetails.reasonForVisit || 'Chưa cập nhật'}</p>
+                <p><strong>Triệu chứng:</strong> {renderList(selectedAppointment.patientDetails.symptoms)}</p>
+                <p><strong>Tiền sử bệnh:</strong> {renderList(selectedAppointment.patientDetails.medicalHistory)}</p>
+                <p><strong>Dị ứng:</strong> {renderList(selectedAppointment.patientDetails.allergies)}</p>
+                <p><strong>Bảo hiểm:</strong> {selectedAppointment.patientDetails.insurance?.provider || 'Chưa cập nhật'}</p>
+              </div>
+            ) : null}
           </div>
         )}
       </div>

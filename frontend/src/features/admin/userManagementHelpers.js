@@ -1,3 +1,4 @@
+
 export function parsePermissions(value) {
   return value
     .split(/\r?\n|,/)

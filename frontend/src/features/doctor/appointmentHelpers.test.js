@@ -29,4 +29,8 @@ describe('appointmentHelpers', () => {
   it('getAppointmentPatientLabel falls back to patient code when name is missing', () => {
     expect(getAppointmentPatientLabel({ patient: { _id: 'patient-123456' } })).toBe('BN 123456')
   })
+
+  it('getAppointmentPatientLabel prefers patient details snapshot', () => {
+    expect(getAppointmentPatientLabel({ patientDetails: { fullName: 'Bệnh nhân A' } })).toBe('Bệnh nhân A')
+  })
 })
