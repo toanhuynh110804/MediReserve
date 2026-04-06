@@ -1,6 +1,7 @@
 const Hospital = require('../models/Hospital');
 const Department = require('../models/Department');
 const Specialty = require('../models/Specialty');
+const Room = require('../models/Room');
 
 let _systemHospitalId = null;
 
@@ -58,6 +59,36 @@ const DEFAULT_SPECIALTIES = [
   { name: 'Phục hồi chức năng', description: 'Vật lý trị liệu và phục hồi chức năng sau điều trị' },
 ];
 
+const DEFAULT_ROOM_FLOORS = 3;
+const DEFAULT_ROOMS_PER_FLOOR = 10;
+
+function buildDefaultRooms(departments = []) {
+  if (!departments.length) return [];
+
+  const rooms = [];
+  let deptIndex = 0;
+
+  for (let floor = 1; floor <= DEFAULT_ROOM_FLOORS; floor += 1) {
+    for (let roomNo = 1; roomNo <= DEFAULT_ROOMS_PER_FLOOR; roomNo += 1) {
+      const department = departments[deptIndex % departments.length];
+      const code = `L${floor}-${String(roomNo).padStart(2, '0')}`;
+
+      rooms.push({
+        code,
+        type: 'consultation',
+        department: department._id,
+        capacity: 1,
+        status: 'available',
+        note: `Lầu ${floor}, phòng khám ${roomNo}`,
+      });
+
+      deptIndex += 1;
+    }
+  }
+
+  return rooms;
+}
+
 /**
  * Trả về ObjectId của bệnh viện hệ thống.
  */
@@ -109,6 +140,22 @@ async function ensureSystemHospital() {
   if (specialtiesToInsert.length > 0) {
     await Specialty.insertMany(specialtiesToInsert);
     console.log(`[SystemHospital] Đã tạo thêm ${specialtiesToInsert.length} chuyên khoa mặc định.`);
+  }
+
+  // Seed phòng mặc định: 3 lầu, mỗi lầu 10 phòng (tự bù các phòng còn thiếu)
+  const hospitalDepartments = await Department.find({ hospital: _systemHospitalId }, '_id').lean();
+  const defaultRooms = buildDefaultRooms(hospitalDepartments);
+  if (defaultRooms.length > 0) {
+    const existingRooms = await Room.find({ code: { $in: defaultRooms.map((room) => room.code) } }, 'code').lean();
+    const existingCodes = new Set(existingRooms.map((room) => room.code));
+    const roomsToInsert = defaultRooms.filter((room) => !existingCodes.has(room.code));
+
+    if (roomsToInsert.length > 0) {
+      await Room.insertMany(roomsToInsert);
+      console.log(`[SystemHospital] Đã tạo thêm ${roomsToInsert.length} phòng mặc định để đủ layout 3 lầu x 10 phòng.`);
+    } else {
+      console.log('[SystemHospital] Layout phòng mặc định đã đầy đủ (3 lầu x 10 phòng).');
+    }
   }
 }
 

@@ -1,10 +1,20 @@
 const Schedule = require('../models/Schedule');
 const { getSystemHospitalId } = require('../config/systemHospital');
 
+const schedulePopulate = [
+  {
+    path: 'doctor',
+    populate: { path: 'user' },
+  },
+  'room',
+  'department',
+  'hospital',
+];
+
 exports.create = async (req, res) => {
   const data = { ...req.body, hospital: getSystemHospitalId() };
   const schedule = await Schedule.create(data);
-  const populated = await Schedule.findById(schedule._id).populate('doctor room department hospital');
+  const populated = await Schedule.findById(schedule._id).populate(schedulePopulate);
   res.status(201).json(populated);
 };
 
@@ -21,19 +31,19 @@ exports.getAll = async (req, res) => {
     query.date = { $gte: start, $lte: end };
   }
 
-  const schedules = await Schedule.find(query).populate('doctor room department hospital');
+  const schedules = await Schedule.find(query).populate(schedulePopulate);
   res.json(schedules);
 };
 
 exports.getById = async (req, res) => {
-  const schedule = await Schedule.findById(req.params.id).populate('doctor room department hospital');
+  const schedule = await Schedule.findById(req.params.id).populate(schedulePopulate);
   if (!schedule) return res.status(404).json({ message: 'Schedule không tồn tại' });
   res.json(schedule);
 };
 
 exports.updateById = async (req, res) => {
   const data = { ...req.body, hospital: getSystemHospitalId() };
-  const schedule = await Schedule.findByIdAndUpdate(req.params.id, data, { new: true }).populate('doctor room department hospital');
+  const schedule = await Schedule.findByIdAndUpdate(req.params.id, data, { new: true }).populate(schedulePopulate);
   if (!schedule) return res.status(404).json({ message: 'Schedule không tồn tại' });
   res.json(schedule);
 };

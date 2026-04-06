@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useMemo, useState } from 'react'
 import { getDepartmentsApi, getSpecialtiesApi } from '../../shared/api/catalogApi'
+import { DateSelect } from '../../shared/components/DateSelect'
 import {
   createRoomApi,
   createScheduleApi,
@@ -27,10 +28,30 @@ const INITIAL_SCHEDULE_FORM = {
   room: '',
   department: '',
   date: '',
-  slot: 'morning',
+  startTime: '08:00',
+  endTime: '11:00',
   capacity: 1,
   status: 'open',
 }
+
+const LEGACY_SLOT_MAP = {
+  morning: { startTime: '08:00', endTime: '11:00' },
+  afternoon: { startTime: '13:00', endTime: '17:00' },
+  evening: { startTime: '17:30', endTime: '20:30' },
+}
+
+const TIME_OPTIONS = (() => {
+  const options = []
+  for (let h = 6; h <= 22; h++) {
+    for (const m of [0, 30]) {
+      if (h === 22 && m === 30) break
+      const hh = String(h).padStart(2, '0')
+      const mm = String(m).padStart(2, '0')
+      options.push(`${hh}:${mm}`)
+    }
+  }
+  return options
+})()
 
 function toDateInput(value) {
   if (!value) return ''
@@ -49,15 +70,56 @@ function buildRoomPayload(formState) {
 }
 
 function buildSchedulePayload(formState) {
+  if (!formState.startTime || !formState.endTime) {
+    throw new Error('Vui lòng chọn đầy đủ giờ bắt đầu và giờ kết thúc.')
+  }
+
+  if (formState.startTime >= formState.endTime) {
+    throw new Error('Giờ kết thúc phải lớn hơn giờ bắt đầu.')
+  }
+
   return {
     doctor: formState.doctor,
     room: formState.room,
     department: formState.department || undefined,
     date: formState.date,
-    slot: formState.slot,
+    slot: `${formState.startTime}-${formState.endTime}`,
     capacity: Number(formState.capacity || 1),
     status: formState.status,
   }
+}
+
+function parseScheduleSlot(slot = '') {
+  const legacyRange = LEGACY_SLOT_MAP[slot]
+  if (legacyRange) {
+    return legacyRange
+  }
+
+  const [rawStart = '', rawEnd = ''] = String(slot).split('-')
+  const startTime = rawStart.trim()
+  const endTime = rawEnd.trim()
+  const isValidTime = (value) => /^\d{2}:\d{2}$/.test(value)
+
+  if (isValidTime(startTime) && isValidTime(endTime)) {
+    return { startTime, endTime }
+  }
+
+  return { startTime: INITIAL_SCHEDULE_FORM.startTime, endTime: INITIAL_SCHEDULE_FORM.endTime }
+}
+
+function renderScheduleSlot(slot = '') {
+  const { startTime, endTime } = parseScheduleSlot(slot)
+  return `${startTime} - ${endTime}`
+}
+
+function renderScheduleStatus(status = '') {
+  const statusMap = {
+    open: 'Đang làm việc',
+    closed: 'Nghỉ trưa',
+    cancelled: 'Không làm việc',
+  }
+
+  return statusMap[status] || status
 }
 
 function getRoomFormState(room) {
@@ -74,12 +136,14 @@ function getRoomFormState(room) {
 
 function getScheduleFormState(schedule) {
   if (!schedule) return INITIAL_SCHEDULE_FORM
+  const parsedSlot = parseScheduleSlot(schedule.slot)
   return {
     doctor: schedule.doctor?._id || schedule.doctor || '',
     room: schedule.room?._id || schedule.room || '',
     department: schedule.department?._id || schedule.department || '',
     date: toDateInput(schedule.date),
-    slot: schedule.slot || 'morning',
+    startTime: parsedSlot.startTime,
+    endTime: parsedSlot.endTime,
     capacity: schedule.capacity ?? 1,
     status: schedule.status || 'open',
   }
@@ -199,7 +263,7 @@ export function AdminOperationsPanel() {
       resetScheduleForm()
       await loadData()
     } catch (requestError) {
-      setError(requestError.response?.data?.message || 'Không thể lưu lịch làm việc.')
+      setError(requestError.response?.data?.message || requestError.message || 'Không thể lưu lịch làm việc.')
     } finally {
       setSaving(false)
     }
@@ -332,9 +396,9 @@ export function AdminOperationsPanel() {
                     <tr key={schedule._id}>
                       <td>{schedule.doctor?.user?.name || schedule.doctor?._id || 'N/A'}</td>
                       <td>{toDateInput(schedule.date)}</td>
-                      <td>{schedule.slot}</td>
+                      <td>{renderScheduleSlot(schedule.slot)}</td>
                       <td>{schedule.room?.code || schedule.room?.roomNumber || 'N/A'}</td>
-                      <td>{schedule.status}</td>
+                      <td>{renderScheduleStatus(schedule.status)}</td>
                       <td>
                         <div className="actions" style={{ flexDirection: 'column', gap: '0.5rem' }}>
                           <button type="button" onClick={() => { setEditingSchedule(schedule); setScheduleForm(getScheduleFormState(schedule)); }} disabled={saving}>Chỉnh sửa</button>
@@ -366,20 +430,40 @@ export function AdminOperationsPanel() {
               {departmentOptions.map((option) => <option key={option.value} value={option.value}>{option.label}</option>)}
             </select>
             <label htmlFor="schedule-date">Ngày làm việc</label>
-            <input id="schedule-date" type="date" value={scheduleForm.date} onChange={(event) => setScheduleForm((current) => ({ ...current, date: event.target.value }))} disabled={saving} required />
-            <label htmlFor="schedule-slot">Khung giờ</label>
-            <select id="schedule-slot" value={scheduleForm.slot} onChange={(event) => setScheduleForm((current) => ({ ...current, slot: event.target.value }))} disabled={saving}>
-              <option value="morning">morning</option>
-              <option value="afternoon">afternoon</option>
-              <option value="evening">evening</option>
+            <DateSelect
+              value={scheduleForm.date}
+              onChange={(v) => setScheduleForm((current) => ({ ...current, date: v }))}
+              disabled={saving}
+              minYear={new Date().getFullYear() - 1}
+              maxYear={new Date().getFullYear() + 2}
+            />
+            <label htmlFor="schedule-start-time">Từ giờ</label>
+            <select
+              id="schedule-start-time"
+              value={scheduleForm.startTime}
+              onChange={(event) => setScheduleForm((current) => ({ ...current, startTime: event.target.value }))}
+              disabled={saving}
+              required
+            >
+              {TIME_OPTIONS.map((t) => <option key={t} value={t}>{t}</option>)}
+            </select>
+            <label htmlFor="schedule-end-time">Đến giờ</label>
+            <select
+              id="schedule-end-time"
+              value={scheduleForm.endTime}
+              onChange={(event) => setScheduleForm((current) => ({ ...current, endTime: event.target.value }))}
+              disabled={saving}
+              required
+            >
+              {TIME_OPTIONS.map((t) => <option key={t} value={t}>{t}</option>)}
             </select>
             <label htmlFor="schedule-capacity">Sức chứa</label>
             <input id="schedule-capacity" type="number" min="1" value={scheduleForm.capacity} onChange={(event) => setScheduleForm((current) => ({ ...current, capacity: event.target.value }))} disabled={saving} />
             <label htmlFor="schedule-status">Trạng thái</label>
             <select id="schedule-status" value={scheduleForm.status} onChange={(event) => setScheduleForm((current) => ({ ...current, status: event.target.value }))} disabled={saving}>
-              <option value="open">open</option>
-              <option value="closed">closed</option>
-              <option value="cancelled">cancelled</option>
+              <option value="open">Đang làm việc</option>
+              <option value="closed">Nghỉ trưa</option>
+              <option value="cancelled">Không làm việc</option>
             </select>
             <div className="actions">
               <button type="submit" disabled={saving}>{saving ? 'Đang lưu...' : editingSchedule ? 'Lưu cập nhật' : 'Tạo lịch'}</button>

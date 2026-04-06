@@ -13,6 +13,7 @@ import {
 } from '../features/patient/transactionSync'
 import { subscribeAppointmentEvents } from '../shared/realtime/socketService'
 import { getDepartmentsApi } from '../shared/api/catalogApi'
+import { DateSelect } from '../shared/components/DateSelect'
 
 function formatDate(value) {
   if (!value) return 'Không xác định'
@@ -234,12 +235,12 @@ export function PatientPage() {
       <div className="status-box">
         <label htmlFor="date-filter">Lọc lịch theo ngày</label>
         <div className="actions">
-          <input
-            id="date-filter"
-            type="date"
+          <DateSelect
             value={dateFilter}
-            onChange={(event) => setDateFilter(event.target.value)}
+            onChange={setDateFilter}
             disabled={isBusy}
+            minYear={new Date().getFullYear()}
+            maxYear={new Date().getFullYear() + 2}
           />
           <button type="button" onClick={() => syncFromServer({ clearFeedback: true, reason: 'manual' })} disabled={isBusy}>
             {syncing ? 'Đang đồng bộ...' : 'Đồng bộ dữ liệu'}
@@ -345,12 +346,12 @@ export function PatientPage() {
         />
 
         <label htmlFor="patient-dob">Ngày sinh</label>
-        <input
-          id="patient-dob"
-          type="date"
+        <DateSelect
           value={patientDetails.dateOfBirth}
-          onChange={(event) => setPatientDetails((current) => ({ ...current, dateOfBirth: event.target.value }))}
+          onChange={(v) => setPatientDetails((current) => ({ ...current, dateOfBirth: v }))}
           disabled={isBusy}
+          minYear={1920}
+          maxYear={new Date().getFullYear()}
         />
 
         <label htmlFor="patient-gender">Giới tính</label>
@@ -446,12 +447,12 @@ export function PatientPage() {
         />
 
         <label htmlFor="insurance-valid-until">Bảo hiểm - hiệu lực đến</label>
-        <input
-          id="insurance-valid-until"
-          type="date"
+        <DateSelect
           value={patientDetails.insuranceValidUntil}
-          onChange={(event) => setPatientDetails((current) => ({ ...current, insuranceValidUntil: event.target.value }))}
+          onChange={(v) => setPatientDetails((current) => ({ ...current, insuranceValidUntil: v }))}
           disabled={isBusy}
+          minYear={new Date().getFullYear()}
+          maxYear={new Date().getFullYear() + 20}
         />
 
         <label htmlFor="schedule-select">Chọn lịch khám còn trống</label>
