@@ -16,6 +16,17 @@ export async function sendChatMessageApi({ content, roomId = null }) {
   return data
 }
 
+// Gửi hình ảnh trong chat qua multipart/form-data
+export async function sendChatImageApi(file, roomId = null) {
+  const formData = new FormData()
+  formData.append('image', file)
+  if (roomId) formData.append('roomId', roomId)
+  const { data } = await httpClient.post('/api/chat/messages/image', formData, {
+    headers: { 'Content-Type': 'multipart/form-data' },
+  })
+  return data
+}
+
 // Staff lấy danh sách các phòng chat
 export async function getChatRoomsApi() {
   const { data } = await httpClient.get('/api/chat/rooms')

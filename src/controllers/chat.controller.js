@@ -35,6 +35,7 @@ exports.sendMessage = async (req, res) => {
     return res.status(400).json({ message: 'Nội dung tin nhắn không được để trống.' });
   }
 
+
   let roomId;
   if (req.user.role === 'patient') {
     roomId = String(req.user._id);
@@ -98,6 +99,44 @@ exports.getRooms = async (req, res) => {
   }));
 
   res.json(normalizedRooms);
+};
+
+// Gửi hình ảnh trong chat (upload qua multipart)
+exports.sendImageMessage = async (req, res) => {
+  const uploadedFile = req.file;
+  if (!uploadedFile) {
+    return res.status(400).json({ message: 'Không có ảnh được tải lên.' });
+  }
+
+  let roomId;
+  if (req.user.role === 'patient') {
+    roomId = String(req.user._id);
+  } else {
+    roomId = req.body.roomId;
+    if (!roomId) {
+      return res.status(400).json({ message: 'roomId là bắt buộc đối với staff/admin.' });
+    }
+  }
+
+  const imageUrl = `/uploads/${uploadedFile.filename}`;
+
+  const msg = await ChatMessage.create({
+    roomId,
+    sender: req.user._id,
+    senderRole: req.user.role,
+    messageType: 'image',
+    content: '',
+    imageUrl,
+  });
+
+  const populated = await ChatMessage.findById(msg._id).populate('sender', 'name email role');
+
+  const io = req.app.get('io');
+  if (io) {
+    io.to(`chat:${roomId}`).emit('chat:message', populated);
+  }
+
+  res.status(201).json(populated);
 };
 
 // Đánh dấu đã đọc toàn bộ tin nhắn trong phòng (staff đọc)

@@ -6,7 +6,10 @@ const chatMessageSchema = new mongoose.Schema(
     roomId: { type: String, required: true, index: true },
     sender: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true },
     senderRole: { type: String, enum: ['patient', 'staff', 'admin'], required: true },
-    content: { type: String, required: true, maxlength: 2000 },
+    // 'text' = tin nhắn văn bản, 'image' = tin nhắn hình ảnh
+    messageType: { type: String, enum: ['text', 'image'], default: 'text' },
+    content: { type: String, default: '', maxlength: 2000 },
+    imageUrl: { type: String, default: null },
     readAt: { type: Date, default: null },
   },
   { timestamps: true }
