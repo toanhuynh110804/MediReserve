@@ -7,6 +7,8 @@ import {
   getStaffAppointmentsApi,
   markAppointmentArrivedApi,
 } from '../../shared/api/staffWorkspaceApi'
+import { getChatRoomsApi } from '../../shared/api/chatApi'
+import { ChatBox } from '../../shared/components/ChatBox'
 
 function getId(value) {
   if (!value) return ''
@@ -53,6 +55,10 @@ export function StaffOperationsPanel() {
   const [selectedPatientId, setSelectedPatientId] = useState('')
   const [selectedScheduleId, setSelectedScheduleId] = useState('')
   const [appointmentNotes, setAppointmentNotes] = useState('')
+  const [chatRooms, setChatRooms] = useState([])
+  const [chatRoomsLoading, setChatRoomsLoading] = useState(false)
+  const [chatRoomsError, setChatRoomsError] = useState('')
+  const [activeChatRoomId, setActiveChatRoomId] = useState(null)
 
   const loadData = useCallback(async () => {
     setLoading(true)
@@ -82,6 +88,35 @@ export function StaffOperationsPanel() {
   useEffect(() => {
     loadData()
   }, [loadData])
+
+  const loadChatRooms = useCallback(async () => {
+    setChatRoomsLoading(true)
+    setChatRoomsError('')
+    try {
+      const rooms = await getChatRoomsApi()
+      const normalized = (rooms || []).map((room) => {
+        const roomId = room.roomId || room._id || ''
+        return {
+          roomId,
+          patientName: room.patientName || null,
+          unreadCount: Number(room.unreadCount ?? room.unread ?? 0),
+          lastMessage: room.lastMessage || '',
+          lastAt: room.lastAt || null,
+        }
+      }).filter((room) => room.roomId)
+      setChatRooms(normalized)
+    } catch {
+      setChatRoomsError('Không thể tải danh sách phòng chat.')
+    } finally {
+      setChatRoomsLoading(false)
+    }
+  }, [])
+
+  useEffect(() => {
+    if (activeTab === 'chat') {
+      loadChatRooms()
+    }
+  }, [activeTab, loadChatRooms])
 
   const doctorNameMap = useMemo(() => getDoctorNameMap(doctors), [doctors])
 
@@ -153,6 +188,7 @@ export function StaffOperationsPanel() {
 
       <div className="actions" style={{ flexWrap: 'wrap', marginBottom: '1rem' }}>
         <button type="button" onClick={() => setActiveTab('appointments')} disabled={loading || saving} style={activeTab === 'appointments' ? { backgroundColor: '#0f766e', color: '#fff' } : undefined}>Lịch khám</button>
+        <button type="button" onClick={() => setActiveTab('chat')} disabled={loading || saving} style={activeTab === 'chat' ? { backgroundColor: '#0f766e', color: '#fff' } : undefined}>Chat hỗ trợ</button>
         <button type="button" onClick={loadData} disabled={loading || saving}>{loading ? 'Đang tải...' : 'Làm mới'}</button>
       </div>
 
@@ -219,6 +255,66 @@ export function StaffOperationsPanel() {
             )}
           </div>
         </>
+      )}
+
+      {activeTab === 'chat' && (
+        <div className="panel">
+          <h2>Chat hỗ trợ bệnh nhân</h2>
+          <p className="muted">Chọn bệnh nhân để xem và trả lời tin nhắn.</p>
+
+          {chatRoomsError ? <p className="form-error">{chatRoomsError}</p> : null}
+          {chatRoomsLoading ? <p className="muted">Đang tải danh sách phòng chat...</p> : null}
+
+          {!chatRoomsLoading && chatRooms.length === 0 ? (
+            <p className="muted">Chưa có bệnh nhân nào nhắn tin.</p>
+          ) : null}
+
+          {chatRooms.length > 0 ? (
+            <div style={{ display: 'flex', gap: '1rem', flexWrap: 'wrap', marginBottom: '1rem' }}>
+              {chatRooms.map((room) => (
+                <button
+                  key={room.roomId}
+                  type="button"
+                  onClick={() => setActiveChatRoomId(room.roomId)}
+                  style={activeChatRoomId === room.roomId
+                    ? { backgroundColor: '#0f766e', color: '#fff', position: 'relative' }
+                    : { position: 'relative' }}
+                >
+                  {room.patientName || room.roomId.slice(-8)}
+                  {room.unreadCount > 0 ? (
+                    <span style={{
+                      position: 'absolute',
+                      top: '-6px',
+                      right: '-6px',
+                      backgroundColor: '#dc2626',
+                      color: '#fff',
+                      borderRadius: '50%',
+                      fontSize: '0.7rem',
+                      minWidth: '18px',
+                      height: '18px',
+                      display: 'inline-flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      padding: '0 3px',
+                    }}>
+                      {room.unreadCount}
+                    </span>
+                  ) : null}
+                </button>
+              ))}
+            </div>
+          ) : null}
+
+          {activeChatRoomId ? (
+            <ChatBox
+              key={activeChatRoomId}
+              roomId={activeChatRoomId}
+              title={`Chat với bệnh nhân ${chatRooms.find((r) => r.roomId === activeChatRoomId)?.patientName || activeChatRoomId.slice(-8)}`}
+            />
+          ) : (
+            <p className="muted">Chọn một bệnh nhân ở trên để bắt đầu chat.</p>
+          )}
+        </div>
       )}
     </section>
   )

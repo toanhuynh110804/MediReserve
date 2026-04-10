@@ -30,6 +30,34 @@ connectDB()
           socket.join(`user:${payload.userId}`);
         }
       });
+
+      // Tham gia phòng chat (bệnh nhân join phòng của mình, staff join phòng của bệnh nhân)
+      socket.on('chat:join', (payload = {}) => {
+        if (payload.roomId) {
+          socket.join(`chat:${payload.roomId}`);
+        }
+      });
+
+      // Nhận và phát tin nhắn qua socket (real-time)
+      socket.on('chat:send', async (payload = {}) => {
+        const { roomId, content, senderId, senderRole, senderName } = payload;
+        if (!roomId || !content?.trim() || !senderId) return;
+
+        try {
+          const ChatMessage = require('./models/ChatMessage');
+          const msg = await ChatMessage.create({
+            roomId,
+            sender: senderId,
+            senderRole: senderRole || 'patient',
+            content: content.trim(),
+          });
+
+          const populated = await ChatMessage.findById(msg._id).populate('sender', 'name email role');
+          io.to(`chat:${roomId}`).emit('chat:message', populated);
+        } catch (err) {
+          socket.emit('chat:error', { message: 'Gửi tin nhắn thất bại.' });
+        }
+      });
     });
 
     server.listen(PORT, () => {

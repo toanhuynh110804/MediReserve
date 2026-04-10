@@ -40,3 +40,25 @@ export function subscribeAppointmentEvents(handler) {
     socket.off('appointment:cancelled', handler)
   }
 }
+
+export function joinChatRoom(roomId) {
+  const socket = getSocket()
+  socket.emit('chat:join', { roomId })
+}
+
+export function sendChatMessageSocket({ roomId, content, senderId, senderRole, senderName }) {
+  const socket = getSocket()
+  socket.emit('chat:send', { roomId, content, senderId, senderRole, senderName })
+}
+
+export function subscribeChatMessages(handler) {
+  const socket = getSocket()
+  socket.on('chat:message', handler)
+  return () => socket.off('chat:message', handler)
+}
+
+export function subscribeChatError(handler) {
+  const socket = getSocket()
+  socket.on('chat:error', handler)
+  return () => socket.off('chat:error', handler)
+}

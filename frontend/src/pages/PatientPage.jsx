@@ -14,6 +14,7 @@ import {
 import { subscribeAppointmentEvents } from '../shared/realtime/socketService'
 import { getDepartmentsApi } from '../shared/api/catalogApi'
 import { DateSelect } from '../shared/components/DateSelect'
+import { ChatBox } from '../shared/components/ChatBox'
 
 function formatDate(value) {
   if (!value) return 'Không xác định'
@@ -558,6 +559,16 @@ export function PatientPage() {
             </div>
           )
         })}
+      </div>
+
+      <div className="panel">
+        <h2>Chat hỗ trợ</h2>
+        <p className="muted">Nhắn tin trực tiếp với nhân viên hỗ trợ của bệnh viện.</p>
+        {(user?.id || user?._id) ? (
+          <ChatBox roomId={user.id || user._id} title="Chat với nhân viên hỗ trợ" />
+        ) : (
+          <p className="muted">Vui lòng đăng nhập để sử dụng tính năng chat.</p>
+        )}
       </div>
     </section>
   )
