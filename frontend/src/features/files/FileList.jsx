@@ -46,12 +46,12 @@ export function FileList({ files = [], onFileDeleted, disabled = false }) {
 
   return (
     <div className="panel">
-      <h2>Tệp của tôi</h2>
+      <h2>Danh sách hồ sơ đã tải</h2>
 
       {error && <p className="form-error">{error}</p>}
 
       {files.length === 0 ? (
-        <p className="muted">Chưa có tệp nào. Tải file lên ở trên.</p>
+        <p className="muted">Chưa có hồ sơ nào. Vui lòng tải hồ sơ ở phần bên trên.</p>
       ) : (
         <table className="file-list">
           <thead>

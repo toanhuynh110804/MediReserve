@@ -117,6 +117,7 @@ export function PatientPage() {
       if (reason === 'post-mutation') {
         setMessage('Đã đồng bộ lại dữ liệu mới nhất từ máy chủ.')
       }
+      // reason === 'booking-success': giữ nguyên message "đặt lịch thành công"
     } catch (requestError) {
       setError(requestError.response?.data?.message || 'Không thể đồng bộ dữ liệu từ máy chủ.')
     } finally {
@@ -168,7 +169,7 @@ export function PatientPage() {
       await createAppointmentFromScheduleApi(selectedSchedule, bookingNotes, patientDetails, {
         departmentId: departmentFilter,
       })
-      setMessage('Đặt lịch thành công. Đang đồng bộ dữ liệu...')
+      setMessage('Đặt lịch thành công! Lịch hẹn của bạn đang chờ bác sĩ xem xét và duyệt. Vui lòng theo dõi trạng thái ở phần Lịch hẹn của tôi bên dưới.')
       setBookingNotes('')
       setPatientDetails((current) => ({
         ...createInitialPatientDetails(user),
@@ -176,7 +177,7 @@ export function PatientPage() {
         email: current.email,
         phone: current.phone,
       }))
-      await syncFromServer({ clearFeedback: false, reason: 'post-mutation' })
+      await syncFromServer({ clearFeedback: false, reason: 'booking-success' })
     } catch (requestError) {
       setError(requestError.response?.data?.message || 'Đặt lịch thất bại.')
     } finally {
@@ -491,8 +492,7 @@ export function PatientPage() {
               !bookingScheduleId ||
               schedules.length === 0 ||
               isBusy ||
-              !departmentFilter ||
-              (departmentFilter && availability && !availability.hasAvailabilityOnSelectedDate)
+              !departmentFilter
             }
           >
             Đặt lịch ngay

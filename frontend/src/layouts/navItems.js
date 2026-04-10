@@ -30,7 +30,7 @@ export function buildNavItems(isAuthenticated, role) {
   }
 
   if (role && role !== ROLES.patient) {
-    authItems.push({ to: '/quan-ly-tep', label: 'Tệp đính kèm' })
+    authItems.push({ to: '/quan-ly-tep', label: 'Hồ sơ bệnh án' })
   }
 
   // Bác sĩ, nhân viên, admin không cần link Trang chủ

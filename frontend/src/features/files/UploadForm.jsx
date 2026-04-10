@@ -20,7 +20,6 @@ export function UploadForm({ onUploadSuccess, disabled = false }) {
       return
     }
 
-    setUploading(true)
     setError('')
 
     try {
@@ -36,10 +35,10 @@ export function UploadForm({ onUploadSuccess, disabled = false }) {
 
   return (
     <div className="panel">
-      <h2>Tải tệp lên</h2>
-      <p className="muted">Tối đa 10MB, hỗ trợ PDF, Word, Excel, hình ảnh.</p>
+      <h2>Tải hồ sơ đính kèm</h2>
+      <p className="muted">Tối đa 10MB, hỗ trợ PDF, Word, Excel và hình ảnh cho nghiệp vụ khám bệnh.</p>
 
-      <label htmlFor="file-input">Chọn tệp</label>
+      <label htmlFor="file-input">Chọn hồ sơ</label>
       <div className="actions">
         <input
           id="file-input"

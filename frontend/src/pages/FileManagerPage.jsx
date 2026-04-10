@@ -39,12 +39,12 @@ export function FileManagerPage() {
   return (
     <section>
       <PageHero
-        eyebrow="Files"
-        title="Quản lý tệp"
-        description="Tải lên, xem và quản lý các tệp đính kèm theo dữ liệu thật từ backend upload multipart."
+        eyebrow="Hồ sơ y tế"
+        title="Quản lý tệp hồ sơ bệnh án"
+        description="Tải lên, xem và quản lý giấy tờ phục vụ khám chữa bệnh từ hệ thống của Bệnh viện Đa Khoa Thủ Đức."
         stats={[
-          { label: 'Tệp hiện có', value: files.length },
-          { label: 'Trạng thái', value: loading ? 'Đang tải' : 'Sẵn sàng' },
+          { label: 'Tổng tệp', value: files.length },
+          { label: 'Tình trạng tải', value: loading ? 'Đang tải' : 'Sẵn sàng' },
         ]}
       />
 
@@ -56,7 +56,7 @@ export function FileManagerPage() {
 
       <div className="actions">
         <button type="button" onClick={fetchFiles} disabled={loading}>
-          {loading ? 'Đang tải...' : 'Tải lại'}
+          {loading ? 'Đang tải...' : 'Làm mới danh sách'}
         </button>
       </div>
 
