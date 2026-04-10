@@ -2,7 +2,7 @@
  * DateSelect – ba dropdown Ngày / Tháng / Năm thay cho <input type="date">
  * value / onChange theo định dạng YYYY-MM-DD (giống input[type=date])
  */
-import { useMemo } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 
 const MONTHS = [
   { value: '01', label: 'Tháng 1' },
@@ -28,14 +28,31 @@ function padTwo(n) {
   return String(n).padStart(2, '0')
 }
 
+function parseParts(value) {
+  const parts = value ? value.split('-') : ['', '', '']
+  return {
+    year: parts[0] || '',
+    month: parts[1] || '',
+    day: parts[2] || '',
+  }
+}
+
 /**
  * @param {{ value: string, onChange: (v: string) => void, disabled?: boolean, minYear?: number, maxYear?: number }} props
  */
 export function DateSelect({ value, onChange, disabled, minYear, maxYear }) {
-  const parts = value ? value.split('-') : ['', '', '']
-  const year  = parts[0] || ''
-  const month = parts[1] || ''
-  const day   = parts[2] || ''
+  const initial = parseParts(value)
+  const [year, setYear] = useState(initial.year)
+  const [month, setMonth] = useState(initial.month)
+  const [day, setDay] = useState(initial.day)
+
+  // Đồng bộ khi prop value thay đổi từ bên ngoài (ví dụ: reset form)
+  useEffect(() => {
+    const p = parseParts(value)
+    setYear(p.year)
+    setMonth(p.month)
+    setDay(p.day)
+  }, [value])
 
   const currentYear = new Date().getFullYear()
   const min = minYear ?? currentYear - 100
@@ -54,7 +71,6 @@ export function DateSelect({ value, onChange, disabled, minYear, maxYear }) {
 
   function emit(newYear, newMonth, newDay) {
     if (!newYear || !newMonth || !newDay) {
-      // trả chuỗi rỗng khi chưa đủ
       onChange('')
       return
     }
@@ -63,10 +79,11 @@ export function DateSelect({ value, onChange, disabled, minYear, maxYear }) {
 
   function handleYear(e) {
     const v = e.target.value
-    // clamp day nếu tháng 2
     const clampedDay = day && daysInMonth(v, month) < Number(day)
       ? padTwo(daysInMonth(v, month))
       : day
+    setYear(v)
+    if (clampedDay !== day) setDay(clampedDay)
     emit(v, month, clampedDay)
   }
 
@@ -75,11 +92,15 @@ export function DateSelect({ value, onChange, disabled, minYear, maxYear }) {
     const clampedDay = day && daysInMonth(year, v) < Number(day)
       ? padTwo(daysInMonth(year, v))
       : day
+    setMonth(v)
+    if (clampedDay !== day) setDay(clampedDay)
     emit(year, v, clampedDay)
   }
 
   function handleDay(e) {
-    emit(year, month, e.target.value)
+    const v = e.target.value
+    setDay(v)
+    emit(year, month, v)
   }
 
   const selectStyle = { flex: 1 }

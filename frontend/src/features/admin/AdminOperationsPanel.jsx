@@ -78,6 +78,10 @@ function buildSchedulePayload(formState) {
     throw new Error('Giờ kết thúc phải lớn hơn giờ bắt đầu.')
   }
 
+  if (!formState.date) {
+    throw new Error('Vui lòng chọn đầy đủ ngày, tháng và năm làm việc.')
+  }
+
   return {
     doctor: formState.doctor,
     room: formState.room,
