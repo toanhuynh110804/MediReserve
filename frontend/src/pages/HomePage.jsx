@@ -1,7 +1,39 @@
 import { Link } from 'react-router-dom'
+import { useAuth } from '../features/auth/useAuth'
+import { ROLE_HOME_PATH, ROLE_LABELS } from '../shared/constants/roles'
 import { PageHero } from '../shared/components/PageHero'
 
 export function HomePage() {
+  const { isAuthenticated, user } = useAuth()
+
+  if (isAuthenticated) {
+    const rolePath = ROLE_HOME_PATH[user?.role]
+    const roleLabel = ROLE_LABELS[user?.role] || 'người dùng'
+
+    return (
+      <section>
+        <PageHero
+          eyebrow="MediReserve"
+          title={`Chào mừng, ${user?.name || roleLabel}!`}
+          description={`Bạn đã đăng nhập với vai trò ${roleLabel}. Truy cập khu vực làm việc của bạn bên dưới.`}
+          stats={[
+            { label: 'Vai trò', value: ROLE_LABELS[user?.role] || '—' },
+            { label: 'Tài khoản', value: user?.email || '—' },
+          ]}
+        />
+        {rolePath ? (
+          <div className="panel accent-panel" style={{ marginTop: '1rem' }}>
+            <h2>Khu vực của bạn</h2>
+            <p className="muted">Nhấn vào đây để đến khu vực làm việc dành cho {roleLabel}.</p>
+            <div className="actions">
+              <Link to={rolePath}>Đi đến khu vực của tôi</Link>
+            </div>
+          </div>
+        ) : null}
+      </section>
+    )
+  }
+
   return (
     <section>
       <PageHero
